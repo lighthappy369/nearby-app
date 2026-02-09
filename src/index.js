@@ -1,5 +1,6 @@
 import http from 'node:http';
 import { randomUUID } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import { saveUser, findUserById, listOtherUsers, saveMatch, listMatchesForUser } from './data/store.js';
 import { rankCandidates, calculateCompatibility } from './services/matchEngine.js';
 import { generateIceBreakers, explainScore } from './services/aiCoach.js';
@@ -7,6 +8,11 @@ import { generateIceBreakers, explainScore } from './services/aiCoach.js';
 function sendJson(res, status, payload) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
   res.end(JSON.stringify(payload));
+}
+
+function sendHtml(res, status, html) {
+  res.writeHead(status, { 'Content-Type': 'text/html; charset=utf-8' });
+  res.end(html);
 }
 
 async function readBody(req) {
@@ -20,11 +26,20 @@ function parsePath(url) {
   return url.split('?')[0].replace(/\/+$/, '') || '/';
 }
 
+async function serveHome(res) {
+  const html = await readFile(new URL('../public/index.html', import.meta.url), 'utf8');
+  return sendHtml(res, 200, html);
+}
+
 async function handler(req, res) {
   const path = parsePath(req.url);
   const method = req.method;
 
   try {
+    if (method === 'GET' && path === '/') {
+      return serveHome(res);
+    }
+
     if (method === 'GET' && path === '/health') {
       return sendJson(res, 200, { ok: true, service: 'empati-ai-mvp' });
     }

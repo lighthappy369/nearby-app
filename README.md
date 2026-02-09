@@ -35,6 +35,22 @@ API varsayılan olarak `http://localhost:3000` üzerinde çalışır.
 npm test
 ```
 
+
+
+## Web Arayüzlü Demo
+
+API ile birlikte çalışan basit bir demo ekranı eklendi. Çalıştırdıktan sonra tarayıcıdan açın:
+
+- `http://localhost:3000/`
+
+Bu ekranda:
+- health kontrolü
+- 2 demo kullanıcı üretimi
+- öneri çekme
+- eşleşme oluşturma
+
+adımlarını butonlarla test edebilirsiniz.
+
 ## API Uç Noktaları
 
 ### 1) Sağlık kontrolü

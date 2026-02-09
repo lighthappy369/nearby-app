@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>empati demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 12px; background:#f7f8fb; color:#222; }
+    .card { background:#fff; border:1px solid #ddd; border-radius:12px; padding:16px; margin-bottom:14px; }
+    h1 { margin-top:0; }
+    button { padding:10px 14px; border-radius:8px; border:0; background:#4f46e5; color:#fff; cursor:pointer; }
+    button:disabled { opacity:.6; cursor:not-allowed; }
+    pre { background:#111827; color:#f9fafb; padding:12px; border-radius:8px; overflow:auto; min-height:120px; }
+    .row { display:flex; gap:8px; flex-wrap:wrap; }
+    input { padding:8px; border:1px solid #ccc; border-radius:8px; }
+  </style>
+</head>
+<body>
+  <h1>empati — Web Demo</h1>
+  <div class="card">
+    <p>Bu ekran, API'nin canlı çalıştığını hızlıca göstermek için hazırlanmış demo arayüzüdür.</p>
+    <div class="row">
+      <button id="healthBtn">Health kontrolü</button>
+      <button id="seedBtn">2 demo kullanıcı oluştur</button>
+      <button id="recBtn" disabled>Önerileri getir</button>
+      <button id="matchBtn" disabled>Eşleşme oluştur</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <label>Ana Kullanıcı ID: <input id="user1" size="42" /></label>
+    <label>Diğer Kullanıcı ID: <input id="user2" size="42" /></label>
+  </div>
+
+  <div class="card">
+    <h3>Çıktı</h3>
+    <pre id="out">Hazır.</pre>
+  </div>
+
+  <script>
+    const out = document.getElementById('out');
+    const user1 = document.getElementById('user1');
+    const user2 = document.getElementById('user2');
+    const recBtn = document.getElementById('recBtn');
+    const matchBtn = document.getElementById('matchBtn');
+
+    const log = (label, data) => {
+      out.textContent = `${label}\n${JSON.stringify(data, null, 2)}`;
+    };
+
+    async function api(path, options = {}) {
+      const res = await fetch(path, {
+        headers: { 'content-type': 'application/json' },
+        ...options,
+      });
+      return res.json();
+    }
+
+    document.getElementById('healthBtn').onclick = async () => {
+      const data = await api('/health');
+      log('Health:', data);
+    };
+
+    document.getElementById('seedBtn').onclick = async () => {
+      const u1 = await api('/users', {
+        method: 'POST',
+        body: JSON.stringify({
+          age: 24,
+          language: 'tr',
+          interests: ['music', 'travel'],
+          values: ['honesty', 'family'],
+          lifestyle: ['active'],
+          location: { lat: 52.52, lon: 13.405 }
+        })
+      });
+
+      const u2 = await api('/users', {
+        method: 'POST',
+        body: JSON.stringify({
+          age: 26,
+          language: 'tr',
+          interests: ['music', 'books'],
+          values: ['honesty', 'growth'],
+          lifestyle: ['active'],
+          location: { lat: 52.53, lon: 13.39 }
+        })
+      });
+
+      user1.value = u1.id || '';
+      user2.value = u2.id || '';
+      recBtn.disabled = !(u1.id && u2.id);
+      matchBtn.disabled = !(u1.id && u2.id);
+      log('Demo kullanıcılar oluşturuldu:', { u1, u2 });
+    };
+
+    recBtn.onclick = async () => {
+      const id = user1.value.trim();
+      const data = await api(`/users/${id}/recommendations`);
+      log('Öneriler:', data);
+    };
+
+    matchBtn.onclick = async () => {
+      const data = await api('/matches', {
+        method: 'POST',
+        body: JSON.stringify({ userA: user1.value.trim(), userB: user2.value.trim() })
+      });
+      log('Eşleşme:', data);
+    };
+  </script>
+</body>
+</html>
