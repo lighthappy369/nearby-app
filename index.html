@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Empati Berlin | Wertebasiertes Matching</title>
+    <meta
+      name="description"
+      content="Empati Berlin ist ein wertebasiertes, arketip-orientiertes Matching für Menschen, die Substanz statt Swipe suchen."
+    />
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --surface: rgba(255, 255, 255, 0.06);
+        --text: #dedede;
+        --muted: rgba(222, 222, 222, 0.82);
+        --muted2: rgba(222, 222, 222, 0.68);
+        --gold: #e1ad01;
+        --danger: #ff5a5f;
+        --line: rgba(255, 255, 255, 0.14);
+        --teal: #00838f;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(1200px 600px at 30% 10%, rgba(225, 173, 1, 0.12), transparent 60%),
+          radial-gradient(900px 500px at 80% 20%, rgba(255, 255, 255, 0.08), transparent 65%), var(--bg);
+        color: var(--text);
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        padding: 40px 16px;
+      }
+      .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .brand {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        text-decoration: none;
+        color: var(--text);
+      }
+      .brand strong {
+        font-size: 1.05rem;
+        letter-spacing: -0.02em;
+      }
+      .brand span {
+        color: var(--muted2);
+        font-size: 0.95rem;
+      }
+      .lang {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        color: var(--muted2);
+        font-size: 0.92rem;
+      }
+      .lang a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .lang a[aria-current="page"] {
+        color: var(--text);
+      }
+      .topbar {
+        position: sticky;
+        top: 10px;
+        z-index: 5;
+        background: linear-gradient(90deg, rgba(225, 173, 1, 0.18), rgba(255, 255, 255, 0.06));
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 14px;
+        padding: 12px 14px;
+        margin: 0 0 18px 0;
+      }
+      .topbar strong {
+        color: var(--text);
+      }
+      .topbar p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.86);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 18px;
+      }
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        padding: 22px;
+        backdrop-filter: blur(8px);
+      }
+      .cardGlow {
+        box-shadow: 0 4px 20px rgba(225, 173, 1, 0.05);
+      }
+      h1 {
+        font-size: clamp(2.1rem, 4.6vw, 3.2rem);
+        letter-spacing: -0.04em;
+        margin: 0 0 12px 0;
+        line-height: 1.08;
+      }
+      .gold {
+        color: var(--gold);
+      }
+      p {
+        line-height: 1.6;
+        color: var(--muted);
+        margin: 0 0 12px 0;
+      }
+      ul {
+        margin: 10px 0 0 18px;
+        padding: 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+      li {
+        margin: 6px 0;
+      }
+      .ctaRow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-top: 16px;
+      }
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: var(--gold);
+        color: #000;
+        padding: 14px 18px;
+        border: none;
+        font-weight: 800;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: transform 0.15s ease, filter 0.15s ease;
+        min-width: 240px;
+      }
+      .cta:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.05);
+      }
+      .ghost {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: var(--text);
+        text-decoration: none;
+        background: transparent;
+      }
+      select {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: var(--text);
+      }
+      option {
+        color: #111;
+      }
+      .cta-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: var(--gold);
+        color: #000;
+        padding: 14px 18px;
+        border: none;
+        font-weight: 800;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: transform 0.15s ease, filter 0.15s ease;
+        width: 100%;
+      }
+      .cta-btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.05);
+      }
+      .note {
+        font-size: 0.9rem;
+        color: var(--muted2);
+        margin-top: 10px;
+      }
+      .pill {
+        display: inline-block;
+        font-size: 0.82rem;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: var(--muted2);
+        margin-bottom: 14px;
+      }
+      .legalWarn {
+        margin-top: 10px;
+        font-size: 0.92rem;
+        color: rgba(255, 255, 255, 0.72);
+      }
+      .legalWarn strong {
+        color: var(--danger);
+      }
+      .faq {
+        margin-top: 18px;
+      }
+      details {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 12px;
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.04);
+        margin: 10px 0;
+      }
+      summary {
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.92);
+        font-weight: 700;
+      }
+      details p {
+        margin: 10px 0 0 0;
+        color: var(--muted);
+      }
+      .paywallBox {
+        text-align: center;
+        padding: 18px;
+        border: 2px solid var(--gold);
+        border-radius: 14px;
+      }
+      .paywallBox h3 {
+        margin: 0 0 8px 0;
+        letter-spacing: -0.02em;
+      }
+      .intentWrap {
+        text-align: center;
+        margin: 14px 0 18px 0;
+      }
+      .intentBtns {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .intentGrid {
+        display: grid;
+        gap: 10px;
+        max-width: 340px;
+        margin: 0 auto;
+      }
+      .btnOutlineGold {
+        background: transparent;
+        border: 1px solid var(--gold);
+        color: var(--gold);
+      }
+      .btnOutline {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--text);
+      }
+      .btnTeal {
+        background: transparent;
+        border: 1px solid rgba(0, 131, 143, 0.6);
+        color: #8be9f0;
+      }
+      .trustBar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 14px 18px;
+        margin-top: 14px;
+        opacity: 0.7;
+        font-size: 0.78rem;
+        color: var(--muted2);
+      }
+      footer {
+        margin-top: 18px;
+        color: var(--muted2);
+        font-size: 0.92rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      footer a {
+        color: var(--muted2);
+      }
+      footer a:hover {
+        color: var(--text);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="topbar" role="note" aria-label="Presale Hinweis">
+        <p>
+          <strong>Berlin, wir bauen etwas Echtes.</strong> Unterstütze unsere Vision als Founder und sichere dir
+          lebenslangen Premium-Zugang für einmalig 4,99€.
+        </p>
+      </div>
+      <header>
+        <a class="brand" href="index.html" aria-label="Empati Berlin Startseite">
+          <strong>Empati Berlin</strong>
+          <span>Wertebasiertes Matching</span>
+        </a>
+        <nav class="lang" aria-label="Sprache">
+          <a href="index.html" aria-current="page">DE</a>
+          <span aria-hidden="true">/</span>
+          <a href="index-en.html">EN</a>
+        </nav>
+      </header>
+
+      <div class="grid">
+        <section class="card" aria-label="Value Proposition">
+          <div class="pill">Early Access • Berlin</div>
+          <h1>
+            Substanz statt Swipe:
+            <span class="gold">wertebasiertes</span> Matching mit Archetypen-Fokus.
+          </h1>
+          <p style="font-size: 0.9rem; color: var(--gold); margin: 0 0 18px 0">
+            Alle 15 Minuten entdeckt ein Berliner seine wahre Natur mit Empati.<br />
+            <span style="color: var(--muted); font-size: 0.8rem">(Inspiriert von C. G. Jung – kein Diagnosetool)</span>
+          </p>
+
+          <section id="intent-section" class="intentWrap" aria-label="Kurze Einstiegsfragen">
+            <div id="step-1">
+              <h3 style="font-size: 1.2rem; margin: 10px 0 12px 0; letter-spacing: -0.02em">
+                1. Bist du bereit, hinter die Fassade zu blicken?
+              </h3>
+              <div class="intentBtns">
+                <button class="cta-btn btnOutlineGold" type="button" onclick="saveIntent('ready', 'yes'); showStep(2)">
+                  Ja, absolut
+                </button>
+                <button class="cta-btn btnOutline" type="button" onclick="saveIntent('ready', 'maybe'); showStep(2)">
+                  Ich bin neugierig
+                </button>
+              </div>
+            </div>
+
+            <div id="step-2" style="display: none">
+              <h3 style="font-size: 1.2rem; margin: 10px 0 12px 0; letter-spacing: -0.02em">
+                2. Was suchst du in Berlin?
+              </h3>
+              <div class="intentGrid">
+                <button
+                  class="cta-btn btnOutlineGold"
+                  type="button"
+                  onclick="saveIntent('goal', 'soulmate'); scrollToSurvey()"
+                >
+                  Soulmatch
+                </button>
+                <button class="cta-btn btnOutline" type="button" onclick="saveIntent('goal', 'deeptalk'); scrollToSurvey()">
+                  Deep Talk & Date
+                </button>
+                <button class="cta-btn btnTeal" type="button" onclick="saveIntent('goal', 'casualdeep'); scrollToSurvey()">
+                  Casual – aber mit Tiefe
+                </button>
+              </div>
+            </div>
+          </section>
+          <p>
+            Empati Berlin verbindet Menschen über Werte, Beziehungsvorstellungen und archetypische Muster – als
+            strukturierter Startpunkt für echte Gespräche (nicht als „Seelenverwandten“-Versprechen).
+          </p>
+
+          <div class="ctaRow">
+            <a href="STRIPE_PAYMENT_LINK_HERE" class="cta" aria-label="Founder Zugang kaufen" rel="nofollow">
+              Werde Founder & Entdecke dich selbst – 4,99 €
+            </a>
+            <a class="ghost" href="#was-du-bekommst">Was du bekommst</a>
+          </div>
+
+          <p class="note">
+            Transparenz: Nach dem Kauf erhältst du sofort eine E-Mail mit dem Link zum ersten Profil-Check (15–20 Fragen) und
+            den nächsten Schritten.
+          </p>
+
+          <div class="faq" aria-label="Mini FAQ">
+            <h2 style="margin: 16px 0 10px 0; letter-spacing: -0.02em">Mini FAQ</h2>
+            <details>
+              <summary>Wann startet das Produkt?</summary>
+              <p>
+                Unser Beta-Launch ist für <strong>März 2026</strong> geplant. Founder können den Profil-Check sofort ausfüllen
+                und erhalten im März die ersten Matching-Empfehlungen.
+              </p>
+            </details>
+            <details>
+              <summary>Warum 4,99€?</summary>
+              <p>
+                Das ist kein Abo. Es ist Community-Support für die ersten Kosten (z. B. Infrastruktur & Store-Setup). Als Dank
+                erhältst du lebenslangen Premium-Zugang.
+              </p>
+            </details>
+          </div>
+        </section>
+
+        <aside class="card cardGlow" id="was-du-bekommst" aria-label="Scope & Benefits">
+          <h2 style="margin: 0 0 10px 0; letter-spacing: -0.02em">Founder Access (4,99 €) beinhaltet</h2>
+          <ul>
+            <li>Early-Bird Zugang zur ersten Berlin-Beta</li>
+            <li>Archetypen-orientierter Profil-Check (15–20 Fragen)</li>
+            <li>Dein Matching-Profil als PDF/Übersicht (Version 1)</li>
+            <li>Priorisierte Einladung zu Updates & neuen Features</li>
+          </ul>
+          <p class="legalWarn">
+            <strong>Wichtig:</strong> Keine therapeutische Leistung. Ergebnisse sind Orientierung, kein Diagnosetool.
+          </p>
+        </aside>
+      </div>
+
+      <footer>
+        <div>
+          <a href="impressum.html">Impressum</a>
+          &nbsp;|&nbsp;
+          <a href="privacy.html">Datenschutzerklärung</a>
+        </div>
+        <div
+          class="trust-bar"
+          style="display: flex; justify-content: center; gap: 25px; margin-top: 50px; opacity: 0.6; font-size: 0.75rem; border-top: 1px solid var(--line); padding-top: 20px; flex-wrap: wrap"
+        >
+          <span>🛡️ Made in Berlin</span>
+          <span>🔒 SSL-verschlüsselt</span>
+          <span>🇪🇺 DSGVO-konform</span>
+        </div>
+
+        <section class="card" aria-label="Profil-Check" style="margin-top: 18px">
+          <h2 style="margin: 0 0 8px 0; letter-spacing: -0.02em">Profil-Check (Beta)</h2>
+          <p class="note" style="margin-top: 0">
+            Skala: 1 (stimme nicht zu) – 5 (stimme voll zu). Nach dem Absenden siehst du eine kurze Vorschau; für die
+            vollständigen Ergebnisse wirst du zum Founder-Checkout weitergeleitet.
+          </p>
+          <form id="archetypeForm">
+            <div style="display: grid; gap: 12px; margin-top: 10px">
+              <label>
+                <span style="display: block; margin-bottom: 6px">1) Neue Menschen zu treffen gibt mir Energie.</span>
+                <select name="q1" required style="width: 100%; padding: 10px; border-radius: 10px">
+                  <option value="" disabled selected>Bitte wählen…</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+              </label>
+              <label>
+                <span style="display: block; margin-bottom: 6px">2) Alleinsein hilft mir, mich zu sortieren.</span>
+                <select name="q2" required style="width: 100%; padding: 10px; border-radius: 10px">
+                  <option value="" disabled selected>Bitte wählen…</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+              </label>
+            </div>
+            <button class="cta" type="submit" style="margin-top: 14px">Profilvorschau erstellen</button>
+            <p class="note">
+              Hinweis: Kein Diagnosetool. Wenn du den Founder-Checkout abschließt, senden wir dir die vollständige Auswertung
+              per E-Mail.
+            </p>
+          </form>
+        </section>
+        <div>© <span id="y">2026</span> Empati Berlin</div>
+      </footer>
+    </div>
+
+    <script>
+      document.getElementById("y").textContent = String(new Date().getFullYear());
+    </script>
+    <script>
+      (function () {
+        var form = document.getElementById("archetypeForm");
+        if (!form) return;
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          form.innerHTML =
+            '<div class="paywallBox" style="padding: 22px; border: 1px solid var(--line); border-radius: 20px; background: rgba(0,0,0,0.25)">' +
+            '<div style="font-size: 3rem; font-weight: 900; color: var(--gold); margin-bottom: 6px">89%</div>' +
+            '<h3 style="margin-top:0;">Potenzielle Übereinstimmung!</h3>' +
+            '<p class="note" style="margin: 0 0 10px 0">Dein Archetyp: <strong>„Der Entdecker“</strong></p>' +
+            '<hr style="border: 0; border-top: 1px solid var(--line); margin: 16px 0" />' +
+            '<p style="text-align: left; font-size: 0.9rem; color: rgba(255,255,255,0.86); margin: 0">' +
+            '✅ <strong>Analyse bereit:</strong> Dein PDF „Map of your Soul“ ist generiert.<br />' +
+            '✅ <strong>Matches gefunden:</strong> Erste kompatible Profile in Berlin wurden identifiziert.' +
+            "</p>" +
+            '<a href="STRIPE_PAYMENT_LINK_HERE" class="cta-btn" rel="nofollow" style="display:block; margin-top: 16px; text-transform: uppercase;">' +
+            "Report freischalten & Founder werden (4,99 €)" +
+            "</a>" +
+            '<p class="note" style="margin-top:10px">Einmalige Zahlung. Kein Abo. Sicherer Checkout.</p>' +
+            "</div>";
+
+          var el = form.closest("section");
+          if (el) {
+            window.scrollTo({ top: el.offsetTop - 30, behavior: "smooth" });
+          }
+        });
+      })();
+    </script>
+    <script>
+      function saveIntent(key, value) {
+        try {
+          localStorage.setItem("empati_intent_" + key, value);
+        } catch (e) {}
+      }
+
+      function showStep(step) {
+        var s1 = document.getElementById("step-1");
+        var s2 = document.getElementById("step-2");
+        if (!s1 || !s2) return;
+        s1.style.display = "none";
+        s2.style.display = "block";
+      }
+
+      function scrollToSurvey() {
+        var s2 = document.getElementById("step-2");
+        if (s2) {
+          s2.innerHTML = '<h3 class="gold" style="margin: 12px 0 0 0;">Perfekt. Starte jetzt deinen Profil-Check.</h3>';
+        }
+        setTimeout(function () {
+          var target = document.querySelector('section[aria-label="Profil-Check"]');
+          if (target) target.scrollIntoView({ behavior: "smooth" });
+        }, 800);
+      }
+    </script>
+  </body>
+</html>
