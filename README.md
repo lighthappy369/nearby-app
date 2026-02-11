@@ -180,3 +180,10 @@ Stripe webhook güvenliği için opsiyonel env:
 - `STRIPE_WEBHOOK_SECRET` (header: `x-stripe-signature`)
 
 Not: Bu hâlâ in-memory iskelettir; sonraki adım PostgreSQL + migration katmanıdır.
+
+
+## Web Arayüz Akışı
+
+- `GET /` : Empati Berlin ana giriş ekranı (döngü haritası/orbit görseli + kayıt CTA).
+- `GET /personality-test` : Jung tabanlı kişilik testi ekranı (ilk 10 soruyu UI üzerinden puanlayıp `/jung/score` çağırır).
+- `GET /launch` : Stripe odaklı launch landing sayfası.

@@ -51,6 +51,12 @@ async function serveLaunch(res) {
   return sendHtml(res, 200, html);
 }
 
+async function serveStatic(res, fileName, contentType = 'text/plain; charset=utf-8') {
+  const file = await readFile(new URL(`../public/${fileName}`, import.meta.url), 'utf8');
+  res.writeHead(200, { 'Content-Type': contentType });
+  res.end(file);
+}
+
 function authUser(req) {
   const token = bearerToken(req);
   const payload = verifyToken(token);
@@ -65,6 +71,10 @@ async function handler(req, res) {
   try {
     if (method === 'GET' && path === '/') return serveHome(res);
     if (method === 'GET' && path === '/launch') return serveLaunch(res);
+    if (method === 'GET' && path === '/personality-test') return serveStatic(res, 'personality-test.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/style.css') return serveStatic(res, 'style.css', 'text/css; charset=utf-8');
+    if (method === 'GET' && path === '/script.js') return serveStatic(res, 'script.js', 'application/javascript; charset=utf-8');
+    if (method === 'GET' && path === '/personality.js') return serveStatic(res, 'personality.js', 'application/javascript; charset=utf-8');
 
     if (method === 'GET' && path === '/health') {
       return sendJson(res, 200, { ok: true, service: 'empati-ai-mvp' });

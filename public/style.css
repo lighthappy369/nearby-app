@@ -1,0 +1,170 @@
+:root {
+  --empati-red: #d10034;
+  --empati-dark-red: #a8002a;
+  --bg-light: #f4f4f7;
+  --text-dark: #333;
+  --white: #fff;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Source Sans Pro', sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 10%;
+  background: var(--white);
+  border-bottom: 1px solid #e0e0e0;
+}
+.logo { font-size: 24px; font-weight: 700; letter-spacing: -1px; }
+.logo span { color: var(--empati-red); margin-left: 4px; }
+.nav-links { display: flex; align-items: center; gap: 12px; }
+.btn-outline {
+  border: 1px solid var(--empati-red);
+  color: var(--empati-red);
+  padding: 8px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.hero-section {
+  padding: 56px 10%;
+  background: linear-gradient(rgba(255,255,255,.86), rgba(255,255,255,.86)),
+              url('https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1920&q=80') center/cover;
+  min-height: 72vh;
+}
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 50px;
+}
+
+.registration-card {
+  background: var(--white);
+  padding: 36px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.1);
+  max-width: 460px;
+  width: 100%;
+}
+.registration-card h1 { font-size: 32px; margin-bottom: 8px; color: #111; line-height: 1.15; }
+.registration-card p { margin-top: 0; color: #575757; }
+.registration-card label { display: block; font-weight: 600; margin: 14px 0 8px; }
+
+.gender-selector { display: flex; gap: 10px; margin-bottom: 14px; }
+.opt-btn {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all .2s;
+}
+.opt-btn:hover,
+.opt-btn.active {
+  border-color: var(--empati-red);
+  color: var(--empati-red);
+  background: #fff5f6;
+}
+
+.btn-main {
+  width: 100%;
+  padding: 18px;
+  background: var(--empati-red);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(209,0,52,.30);
+}
+.btn-main:hover { background: var(--empati-dark-red); }
+
+.trust-icons {
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  color: #666;
+}
+
+.visual-side { display: flex; flex-direction: column; align-items: center; flex: 1; }
+.orbit-box {
+  width: 320px;
+  height: 320px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(209,0,52,.12);
+}
+.ring-one { width: 100%; height: 100%; animation: spin 18s linear infinite; }
+.ring-two { width: 80%; height: 80%; border-top: 4px solid rgba(209,0,52,.72); animation: spinReverse 12s linear infinite; }
+.ring-three { width: 58%; height: 58%; border-top: 3px solid rgba(209,0,52,.5); animation: spin 8s linear infinite; }
+
+.core-avatar img {
+  width: 122px;
+  height: 122px;
+  border-radius: 50%;
+  border: 6px solid white;
+  box-shadow: 0 10px 20px rgba(0,0,0,.2);
+}
+.orbit-dot {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: var(--empati-red);
+  border-radius: 50%;
+  box-shadow: 0 0 0 8px rgba(209,0,52,.15);
+}
+.dot-a { top: 26px; left: 148px; }
+.dot-b { right: 42px; bottom: 92px; }
+.dot-c { left: 54px; bottom: 76px; }
+
+.stat-text { text-align: center; margin-top: 24px; max-width: 380px; }
+.stat-text h3 { margin-bottom: 8px; }
+
+.next-step {
+  max-width: 900px;
+  margin: 28px auto 52px;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+}
+.btn-secondary {
+  display: inline-block;
+  text-decoration: none;
+  padding: 11px 18px;
+  border-radius: 6px;
+  background: #1f2937;
+  color: #fff;
+  font-weight: 600;
+}
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes spinReverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+
+@media (max-width: 900px) {
+  .navbar, .hero-section { padding-left: 18px; padding-right: 18px; }
+  .container { flex-direction: column; }
+  .registration-card { max-width: 100%; }
+  .trust-icons { flex-direction: column; }
+}

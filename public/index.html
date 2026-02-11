@@ -3,109 +3,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>empati demo</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 12px; background:#f7f8fb; color:#222; }
-    .card { background:#fff; border:1px solid #ddd; border-radius:12px; padding:16px; margin-bottom:14px; }
-    h1 { margin-top:0; }
-    button { padding:10px 14px; border-radius:8px; border:0; background:#4f46e5; color:#fff; cursor:pointer; }
-    button:disabled { opacity:.6; cursor:not-allowed; }
-    pre { background:#111827; color:#f9fafb; padding:12px; border-radius:8px; overflow:auto; min-height:120px; }
-    .row { display:flex; gap:8px; flex-wrap:wrap; }
-    input { padding:8px; border:1px solid #ccc; border-radius:8px; }
-  </style>
+  <title>Empati Berlin | Bilimsel Eşleşme</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <h1>empati — Web Demo</h1>
-  <div class="card">
-    <p>Bu ekran, API'nin canlı çalıştığını hızlıca göstermek için hazırlanmış demo arayüzüdür.</p>
-    <div class="row">
-      <button id="healthBtn">Health kontrolü</button>
-      <button id="seedBtn">2 demo kullanıcı oluştur</button>
-      <button id="recBtn" disabled>Önerileri getir</button>
-      <button id="matchBtn" disabled>Eşleşme oluştur</button>
+  <header class="navbar">
+    <div class="logo">EMPATİ<span>BERLIN</span></div>
+    <div class="nav-links">
+      <span>Zaten üye misiniz?</span>
+      <a href="/launch" class="btn-outline">Giriş Yap</a>
     </div>
-  </div>
+  </header>
 
-  <div class="card">
-    <label>Ana Kullanıcı ID: <input id="user1" size="42" /></label>
-    <label>Diğer Kullanıcı ID: <input id="user2" size="42" /></label>
-  </div>
+  <main class="hero-section">
+    <div class="container">
+      <section class="registration-card">
+        <h1>Mutluluğunuzu şansa bırakmayın.</h1>
+        <p>Bilimsel analiz ile ruh eşinizi bulun.</p>
 
-  <div class="card">
-    <h3>Çıktı</h3>
-    <pre id="out">Hazır.</pre>
-  </div>
+        <form id="start-form">
+          <label>Ben bir...</label>
+          <div class="gender-selector" data-group="self">
+            <button type="button" class="opt-btn">Kadınım</button>
+            <button type="button" class="opt-btn">Erkeğim</button>
+          </div>
 
-  <script>
-    const out = document.getElementById('out');
-    const user1 = document.getElementById('user1');
-    const user2 = document.getElementById('user2');
-    const recBtn = document.getElementById('recBtn');
-    const matchBtn = document.getElementById('matchBtn');
+          <label>Aradığım kişi...</label>
+          <div class="gender-selector" data-group="target">
+            <button type="button" class="opt-btn">Erkek</button>
+            <button type="button" class="opt-btn">Kadın</button>
+          </div>
 
-    const log = (label, data) => {
-      out.textContent = `${label}\n${JSON.stringify(data, null, 2)}`;
-    };
+          <button type="submit" class="btn-main">ÜCRETSİZ KAYDOL & TESTE BAŞLA</button>
+        </form>
 
-    async function api(path, options = {}) {
-      const res = await fetch(path, {
-        headers: { 'content-type': 'application/json' },
-        ...options,
-      });
-      return res.json();
-    }
+        <div class="trust-icons">
+          <span>🔒 256-bit SSL Güvenliği</span>
+          <span>✓ GDPR Uyumlu Veri Koruma</span>
+        </div>
+      </section>
 
-    document.getElementById('healthBtn').onclick = async () => {
-      const data = await api('/health');
-      log('Health:', data);
-    };
+      <section class="visual-side">
+        <div class="orbit-box" aria-label="eşleşme döngü haritası">
+          <div class="ring ring-one"></div>
+          <div class="ring ring-two"></div>
+          <div class="ring ring-three"></div>
+          <div class="core-avatar">
+            <img src="https://i.pravatar.cc/180?u=empati-premium" alt="Örnek profil" />
+          </div>
+          <div class="orbit-dot dot-a"></div>
+          <div class="orbit-dot dot-b"></div>
+          <div class="orbit-dot dot-c"></div>
+        </div>
+        <div class="stat-text">
+          <h3>90%+ Uyumlu Eşleşme Potansiyeli</h3>
+          <p>Döngü haritası ile ortak değer, ilgi alanı ve iletişim ritmini tek bakışta gör.</p>
+        </div>
+      </section>
+    </div>
+  </main>
 
-    document.getElementById('seedBtn').onclick = async () => {
-      const u1 = await api('/users', {
-        method: 'POST',
-        body: JSON.stringify({
-          age: 24,
-          language: 'tr',
-          interests: ['music', 'travel'],
-          values: ['honesty', 'family'],
-          lifestyle: ['active'],
-          location: { lat: 52.52, lon: 13.405 }
-        })
-      });
+  <section class="next-step">
+    <h2>Sıradaki Adım: Kişilik Testi</h2>
+    <p>Hızlı test ile arketipini öğren, daha kaliteli eşleşmeleri anında gör.</p>
+    <a class="btn-secondary" href="/personality-test">Kişilik Testine Geç</a>
+  </section>
 
-      const u2 = await api('/users', {
-        method: 'POST',
-        body: JSON.stringify({
-          age: 26,
-          language: 'tr',
-          interests: ['music', 'books'],
-          values: ['honesty', 'growth'],
-          lifestyle: ['active'],
-          location: { lat: 52.53, lon: 13.39 }
-        })
-      });
-
-      user1.value = u1.id || '';
-      user2.value = u2.id || '';
-      recBtn.disabled = !(u1.id && u2.id);
-      matchBtn.disabled = !(u1.id && u2.id);
-      log('Demo kullanıcılar oluşturuldu:', { u1, u2 });
-    };
-
-    recBtn.onclick = async () => {
-      const id = user1.value.trim();
-      const data = await api(`/users/${id}/recommendations`);
-      log('Öneriler:', data);
-    };
-
-    matchBtn.onclick = async () => {
-      const data = await api('/matches', {
-        method: 'POST',
-        body: JSON.stringify({ userA: user1.value.trim(), userB: user2.value.trim() })
-      });
-      log('Eşleşme:', data);
-    };
-  </script>
+  <script src="/script.js"></script>
 </body>
 </html>
