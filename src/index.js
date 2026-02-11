@@ -1,5 +1,5 @@
 import http from 'node:http';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import {
   saveUser,
@@ -29,15 +29,26 @@ function sendHtml(res, status, html) {
   res.end(html);
 }
 
-async function readBody(req) {
-  const chunks = [];
-  for await (const chunk of req) chunks.push(chunk);
-  if (!chunks.length) return {};
-  return JSON.parse(Buffer.concat(chunks).toString('utf8'));
-}
-
 function parsePath(url) {
   return url.split('?')[0].replace(/\/+$/, '') || '/';
+}
+
+async function readRawBody(req) {
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  return Buffer.concat(chunks);
+}
+
+async function readBody(req) {
+  const raw = await readRawBody(req);
+  if (!raw.length) return {};
+  try {
+    return JSON.parse(raw.toString('utf8'));
+  } catch {
+    const error = new Error('invalid JSON');
+    error.status = 400;
+    throw error;
+  }
 }
 
 async function serveHome(res) {
@@ -61,7 +72,41 @@ function authUser(req) {
   const token = bearerToken(req);
   const payload = verifyToken(token);
   if (!payload?.sub) return null;
-  return findUserById(payload.sub);
+  const user = findUserById(payload.sub);
+  return user ? { ...user, tokenPayload: payload } : null;
+}
+
+function isOwnerOrAdmin(actor, ownerId) {
+  return actor && (actor.id === ownerId || actor.role === 'admin');
+}
+
+function sanitizeStringArray(value) {
+  if (value == null) return [];
+  if (!Array.isArray(value)) return null;
+  const items = value
+    .filter((entry) => typeof entry === 'string')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  return items;
+}
+
+function sanitizeLocation(location) {
+  if (location == null) return null;
+  const lat = Number(location.lat);
+  const lon = Number(location.lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+  return { lat, lon };
+}
+
+function verifyWebhookSignature(signature, rawBody) {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!secret) return false;
+  const expected = Buffer.from(secret);
+  const received = Buffer.from(String(signature || ''));
+  if (expected.length !== received.length) return false;
+  if (!timingSafeEqual(expected, received)) return false;
+  return rawBody.length > 0;
 }
 
 async function handler(req, res) {
@@ -84,15 +129,16 @@ async function handler(req, res) {
       const { email, password, age = 18, language = 'tr' } = await readBody(req);
       if (!email || !password) return sendJson(res, 400, { error: 'email and password required.' });
       if (findUserByEmail(email)) return sendJson(res, 409, { error: 'email already used.' });
-      if (age < 15) return sendJson(res, 400, { error: 'Minimum age is 15.' });
+      if (!Number.isFinite(Number(age)) || Number(age) < 15) return sendJson(res, 400, { error: 'Minimum age is 15.' });
 
       const salt = makeSalt();
       const user = saveUser({
         id: randomUUID(),
-        email,
+        role: 'user',
+        email: String(email).trim().toLowerCase(),
         passwordHash: hashPassword(password, salt),
         salt,
-        age,
+        age: Number(age),
         language,
         interests: [],
         values: [],
@@ -100,7 +146,7 @@ async function handler(req, res) {
         createdAt: new Date().toISOString()
       });
 
-      const token = createToken({ sub: user.id, email: user.email });
+      const token = createToken({ sub: user.id, email: user.email, role: user.role });
       return sendJson(res, 201, { token, user: { id: user.id, email: user.email, age: user.age } });
     }
 
@@ -110,7 +156,7 @@ async function handler(req, res) {
       if (!user) return sendJson(res, 401, { error: 'invalid credentials.' });
       const ok = hashPassword(password, user.salt) === user.passwordHash;
       if (!ok) return sendJson(res, 401, { error: 'invalid credentials.' });
-      const token = createToken({ sub: user.id, email: user.email });
+      const token = createToken({ sub: user.id, email: user.email, role: user.role || 'user' });
       return sendJson(res, 200, { token, user: { id: user.id, email: user.email, age: user.age } });
     }
 
@@ -118,30 +164,36 @@ async function handler(req, res) {
       const user = authUser(req);
       if (!user) return sendJson(res, 401, { error: 'unauthorized.' });
       return sendJson(res, 200, {
-        user: { id: user.id, email: user.email, age: user.age, language: user.language },
+        user: { id: user.id, email: user.email, role: user.role || 'user', age: user.age, language: user.language },
         subscription: getSubscription(user.id)
       });
     }
 
     if (method === 'POST' && path === '/events') {
       const user = authUser(req);
+      if (!user) return sendJson(res, 401, { error: 'unauthorized.' });
+
       const { name, metadata = {} } = await readBody(req);
       if (!validateEventName(name)) return sendJson(res, 400, { error: 'unsupported event name.' });
-      const row = saveEvent({ userId: user?.id || null, name, metadata });
+      const row = saveEvent({ userId: user.id, name, metadata });
       return sendJson(res, 201, row);
     }
 
     if (method === 'GET' && path === '/events') {
+      const user = authUser(req);
+      if (!user) return sendJson(res, 401, { error: 'unauthorized.' });
+      if (user.role !== 'admin') return sendJson(res, 403, { error: 'admin access required.' });
       return sendJson(res, 200, { items: listEvents(100) });
     }
 
     if (method === 'POST' && path === '/stripe/webhook') {
-      const { type, data = {} } = await readBody(req);
+      const rawBody = await readRawBody(req);
       const signature = req.headers['x-stripe-signature'];
-      if ((process.env.STRIPE_WEBHOOK_SECRET || '') && signature !== process.env.STRIPE_WEBHOOK_SECRET) {
+      if (!verifyWebhookSignature(signature, rawBody)) {
         return sendJson(res, 401, { error: 'invalid webhook signature.' });
       }
 
+      const { type, data = {} } = JSON.parse(rawBody.toString('utf8'));
       if (type === 'checkout.session.completed') {
         const userId = data?.metadata?.userId;
         if (userId) setSubscription(userId, 'active', { provider: 'stripe', plan: data?.metadata?.plan || 'monthly' });
@@ -161,6 +213,7 @@ async function handler(req, res) {
 
     if (method === 'POST' && path === '/jung/score') {
       const { answers = [] } = await readBody(req);
+      if (!Array.isArray(answers)) return sendJson(res, 422, { error: 'answers must be an array.' });
       const result = scoreJungAnswers(answers);
       if (answers.length > 0) {
         saveEvent({ userId: null, name: 'test_completed', metadata: { type: result.type, completionRate: result.quality.completionRate } });
@@ -170,15 +223,39 @@ async function handler(req, res) {
 
     if (method === 'POST' && path === '/users') {
       const { age, language, interests = [], values = [], lifestyle = [], location } = await readBody(req);
-      if (!age || age < 15) return sendJson(res, 400, { error: 'Minimum age is 15.' });
+      const parsedAge = Number(age);
+      if (!Number.isFinite(parsedAge) || parsedAge < 15) return sendJson(res, 400, { error: 'Minimum age is 15.' });
 
-      const user = { id: randomUUID(), age, language, interests, values, lifestyle, location, createdAt: new Date().toISOString() };
+      const nextInterests = sanitizeStringArray(interests);
+      const nextValues = sanitizeStringArray(values);
+      const nextLifestyle = sanitizeStringArray(lifestyle);
+      if (!nextInterests || !nextValues || !nextLifestyle) {
+        return sendJson(res, 422, { error: 'interests, values and lifestyle must be arrays of strings.' });
+      }
+
+      const nextLocation = sanitizeLocation(location);
+      if (location && !nextLocation) return sendJson(res, 422, { error: 'location must include valid lat/lon.' });
+
+      const user = {
+        id: randomUUID(),
+        role: 'user',
+        age: parsedAge,
+        language,
+        interests: nextInterests,
+        values: nextValues,
+        lifestyle: nextLifestyle,
+        location: nextLocation,
+        createdAt: new Date().toISOString()
+      };
       saveUser(user);
       return sendJson(res, 201, user);
     }
 
     const recMatch = path.match(/^\/users\/([^/]+)\/recommendations$/);
     if (method === 'GET' && recMatch) {
+      const caller = authUser(req);
+      if (!isOwnerOrAdmin(caller, recMatch[1])) return sendJson(res, 403, { error: 'forbidden.' });
+
       const user = findUserById(recMatch[1]);
       if (!user) return sendJson(res, 404, { error: 'User not found.' });
 
@@ -209,6 +286,9 @@ async function handler(req, res) {
 
     const userMatch = path.match(/^\/users\/([^/]+)\/matches$/);
     if (method === 'GET' && userMatch) {
+      const caller = authUser(req);
+      if (!isOwnerOrAdmin(caller, userMatch[1])) return sendJson(res, 403, { error: 'forbidden.' });
+
       const user = findUserById(userMatch[1]);
       if (!user) return sendJson(res, 404, { error: 'User not found.' });
       return sendJson(res, 200, { items: listMatchesForUser(user.id) });
@@ -216,21 +296,28 @@ async function handler(req, res) {
 
     if (method === 'POST' && path === '/moderation/report') {
       const reporter = authUser(req);
+      if (!reporter) return sendJson(res, 401, { error: 'unauthorized.' });
+
       const { targetUserId, reason } = await readBody(req);
       if (!targetUserId || !reason) return sendJson(res, 400, { error: 'targetUserId and reason required.' });
-      const row = saveEvent({ userId: reporter?.id || null, name: 'moderation_report', metadata: { targetUserId, reason } });
+      const row = saveEvent({ userId: reporter.id, name: 'moderation_report', metadata: { targetUserId, reason } });
       return sendJson(res, 201, row);
     }
 
     return sendJson(res, 404, { error: 'Route not found.' });
   } catch (error) {
-    return sendJson(res, 500, { error: 'Internal error.', details: error.message });
+    if (error?.status) return sendJson(res, error.status, { error: error.message });
+    return sendJson(res, 500, { error: 'Internal error.' });
   }
 }
 
 const server = http.createServer(handler);
 const port = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== 'test') {
+  if (!process.env.AUTH_SECRET) {
+    throw new Error('AUTH_SECRET is required outside test mode.');
+  }
+
   server.listen(port, () => {
     console.log(`empati api running on :${port}`);
   });

@@ -17,3 +17,14 @@ test('scoreJungAnswers returns type, archetype and quality', () => {
   assert.equal(typeof result.quality.completionRate, 'number');
   assert.equal(result.quality.completionRate, 100);
 });
+
+test('scoreJungAnswers ignores duplicate and invalid answers', () => {
+  const result = scoreJungAnswers([
+    { id: 'q1', value: 5 },
+    { id: 'q1', value: 3 },
+    { id: 'q2', value: 8 },
+    { id: 'x', value: 3 }
+  ]);
+
+  assert.equal(result.quality.completionRate, 3);
+});

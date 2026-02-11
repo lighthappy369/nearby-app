@@ -37,19 +37,13 @@ npm test
 
 
 
-## Web Arayüzlü Demo
+## Web Arayüz Akışı
 
-API ile birlikte çalışan basit bir demo ekranı eklendi. Çalıştırdıktan sonra tarayıcıdan açın:
+Uygulama artık basit debug panel yerine funnel odaklı web akışı sunar:
 
-- `http://localhost:3000/`
-
-Bu ekranda:
-- health kontrolü
-- 2 demo kullanıcı üretimi
-- öneri çekme
-- eşleşme oluşturma
-
-adımlarını butonlarla test edebilirsiniz.
+- `http://localhost:3000/` : premium giriş ekranı (orbit/döngü haritası + kayıt CTA)
+- `http://localhost:3000/personality-test` : Jung tabanlı test ekranı
+- `http://localhost:3000/launch` : Stripe odaklı landing ekranı
 
 ## API Uç Noktaları
 
@@ -73,7 +67,7 @@ adımlarını butonlarla test edebilirsiniz.
 ```
 
 ### 3) Önerilen eşleşmeleri getir
-`GET /users/:id/recommendations`
+`GET /users/:id/recommendations` (Bearer token gerekli, owner/admin)
 
 Döndürülen her aday için:
 - `score` (0-100)
@@ -92,7 +86,7 @@ Döndürülen her aday için:
 ```
 
 ### 5) Kullanıcının eşleşmelerini getir
-`GET /users/:id/matches`
+`GET /users/:id/matches` (Bearer token gerekli, owner/admin)
 
 ### 6) Jung soruları
 `GET /jung/questions`
@@ -124,7 +118,7 @@ Döndürülen her aday için:
 `POST /stripe/webhook`
 
 ### 12) Event tracking
-`POST /events`, `GET /events`
+`POST /events` (Bearer token gerekli), `GET /events` (admin token gerekli)
 
 ## Monetizasyon için bir sonraki teknik adımlar
 
@@ -175,15 +169,9 @@ Bu sürümde production'a geçiş için temel iskelet endpointleri eklendi:
 - `GET /events`
 - `POST /moderation/report`
 
-Stripe webhook güvenliği için opsiyonel env:
+Stripe webhook ve auth güvenliği için gerekli env:
 
+- `AUTH_SECRET` (test dışında zorunlu)
 - `STRIPE_WEBHOOK_SECRET` (header: `x-stripe-signature`)
 
 Not: Bu hâlâ in-memory iskelettir; sonraki adım PostgreSQL + migration katmanıdır.
-
-
-## Web Arayüz Akışı
-
-- `GET /` : Empati Berlin ana giriş ekranı (döngü haritası/orbit görseli + kayıt CTA).
-- `GET /personality-test` : Jung tabanlı kişilik testi ekranı (ilk 10 soruyu UI üzerinden puanlayıp `/jung/score` çağırır).
-- `GET /launch` : Stripe odaklı launch landing sayfası.

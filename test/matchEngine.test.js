@@ -22,6 +22,15 @@ test('calculateCompatibility returns deterministic weighted score', () => {
   assert.ok(result.breakdown.interest > 0);
 });
 
+test('calculateCompatibility tolerates non-string tags', () => {
+  const result = calculateCompatibility(
+    { interests: ['music', 10], values: ['honesty', null], lifestyle: ['active'], location: { lat: 10, lon: 10 } },
+    { interests: ['music', {}], values: ['honesty'], lifestyle: ['active'], location: { lat: 10, lon: 10 } }
+  );
+
+  assert.ok(result.score > 0);
+});
+
 test('rankCandidates sorts by descending score', () => {
   const user = {
     interests: ['music'],
