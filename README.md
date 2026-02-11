@@ -94,6 +94,23 @@ Döndürülen her aday için:
 ### 5) Kullanıcının eşleşmelerini getir
 `GET /users/:id/matches`
 
+### 6) Jung soruları
+`GET /jung/questions`
+
+### 7) Jung skorla
+`POST /jung/score`
+
+Örnek gövde:
+
+```json
+{
+  "answers": [
+    { "id": "q1", "value": 5 },
+    { "id": "q2", "value": 3 }
+  ]
+}
+```
+
 ## Monetizasyon için bir sonraki teknik adımlar
 
 1. Stripe/RevenueCat ile abonelik katmanı
@@ -116,3 +133,16 @@ Yatırımcı sunumu, landing page ve abonelik açıklaması için hazır TR meti
 - `docs/monetization-copy-tr.md`
 
 Bu dosyada 3 farklı ton (profesyonel, kısa pazarlama, pitch deck) ve doğrudan kullanılabilir şablonlar bulunur.
+
+
+## Day 1 Launch Paket
+
+Hızlı gelir doğrulaması için landing sayfası eklendi:
+
+- `http://localhost:3000/launch`
+- Stripe ödeme linki için env: `STRIPE_PAYMENT_LINK`
+
+Ayrıca Jung tabanlı test MVP endpointleri eklendi:
+
+- `GET /jung/questions`
+- `POST /jung/score`

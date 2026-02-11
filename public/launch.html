@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>empati - Berlin Launch</title>
+  <style>
+    body{font-family:Inter,Arial,sans-serif;background:#0b1020;color:#e5e7eb;max-width:920px;margin:30px auto;padding:0 16px}
+    .hero{background:#111827;border:1px solid #374151;border-radius:16px;padding:24px}
+    h1{margin:0 0 10px}
+    .cta{display:inline-block;margin-top:12px;background:#8b5cf6;color:#fff;padding:12px 16px;border-radius:10px;text-decoration:none;font-weight:700}
+    .muted{color:#9ca3af}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
+    .card{background:#111827;border:1px solid #374151;border-radius:12px;padding:14px}
+    code{background:#1f2937;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <h1>empati — Berlin'de yanlış eşleşmelere son</h1>
+    <p>1 aylık odaklı etkileşim modeliyle, zamandan ve paradan tasarruf ederek daha bilinçli ilişki kararları ver.</p>
+    <a class="cta" href="__STRIPE_PAYMENT_LINK__" target="_blank" rel="noreferrer">Founding Member (4.99€)</a>
+    <p class="muted">Stripe linki yoksa <code>#</code> olarak çalışır; sunucuda <code>STRIPE_PAYMENT_LINK</code> env tanımlayın.</p>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <h3>Bugün</h3>
+      <p>Landing + ödeme akışı + trafik linki</p>
+    </div>
+    <div class="card">
+      <h3>Bu hafta</h3>
+      <p>Jung test beta + waitlist + ilk ödeme doğrulaması</p>
+    </div>
+    <div class="card">
+      <h3>KPI</h3>
+      <p>Checkout tıklama, ödeme, test tamamlama</p>
+    </div>
+  </section>
+</body>
+</html>

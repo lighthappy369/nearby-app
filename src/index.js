@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { saveUser, findUserById, listOtherUsers, saveMatch, listMatchesForUser } from './data/store.js';
 import { rankCandidates, calculateCompatibility } from './services/matchEngine.js';
 import { generateIceBreakers, explainScore } from './services/aiCoach.js';
+import { listJungQuestions, scoreJungAnswers } from './services/jungEngine.js';
 
 function sendJson(res, status, payload) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -31,6 +32,12 @@ async function serveHome(res) {
   return sendHtml(res, 200, html);
 }
 
+async function serveLaunch(res) {
+  let html = await readFile(new URL('../public/launch.html', import.meta.url), 'utf8');
+  html = html.replace('__STRIPE_PAYMENT_LINK__', process.env.STRIPE_PAYMENT_LINK || '#');
+  return sendHtml(res, 200, html);
+}
+
 async function handler(req, res) {
   const path = parsePath(req.url);
   const method = req.method;
@@ -38,6 +45,20 @@ async function handler(req, res) {
   try {
     if (method === 'GET' && path === '/') {
       return serveHome(res);
+    }
+
+
+    if (method === 'GET' && path === '/launch') {
+      return serveLaunch(res);
+    }
+
+    if (method === 'GET' && path === '/jung/questions') {
+      return sendJson(res, 200, { items: listJungQuestions() });
+    }
+
+    if (method === 'POST' && path === '/jung/score') {
+      const { answers = [] } = await readBody(req);
+      return sendJson(res, 200, scoreJungAnswers(answers));
     }
 
     if (method === 'GET' && path === '/health') {
