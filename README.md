@@ -111,6 +111,21 @@ Döndürülen her aday için:
 }
 ```
 
+### 8) Auth register
+`POST /auth/register`
+
+### 9) Auth login
+`POST /auth/login`
+
+### 10) Me (token gerekli)
+`GET /me`
+
+### 11) Stripe webhook
+`POST /stripe/webhook`
+
+### 12) Event tracking
+`POST /events`, `GET /events`
+
 ## Monetizasyon için bir sonraki teknik adımlar
 
 1. Stripe/RevenueCat ile abonelik katmanı
@@ -146,3 +161,22 @@ Ayrıca Jung tabanlı test MVP endpointleri eklendi:
 
 - `GET /jung/questions`
 - `POST /jung/score`
+
+
+## Production Skeleton (DB + Auth + Stripe Webhook)
+
+Bu sürümde production'a geçiş için temel iskelet endpointleri eklendi:
+
+- `POST /auth/register`
+- `POST /auth/login`
+- `GET /me` (Bearer token)
+- `POST /stripe/webhook`
+- `POST /events`
+- `GET /events`
+- `POST /moderation/report`
+
+Stripe webhook güvenliği için opsiyonel env:
+
+- `STRIPE_WEBHOOK_SECRET` (header: `x-stripe-signature`)
+
+Not: Bu hâlâ in-memory iskelettir; sonraki adım PostgreSQL + migration katmanıdır.
