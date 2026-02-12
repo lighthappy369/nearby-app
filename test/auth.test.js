@@ -1,3 +1,5 @@
+process.env.AUTH_SECRET = 'test-secret';
+
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createToken, verifyToken, hashPassword, makeSalt } from '../src/services/auth.js';

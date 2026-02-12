@@ -5,7 +5,6 @@ const TOKEN_ISSUER = 'empati';
 
 function tokenSecret() {
   if (process.env.AUTH_SECRET) return process.env.AUTH_SECRET;
-  if (process.env.NODE_ENV !== 'production') return 'empati-dev-secret';
   return null;
 }
 
@@ -55,7 +54,7 @@ export function verifyToken(token) {
   try {
     const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
     const now = Math.floor(Date.now() / 1000);
-    if (!payload?.sub || !payload?.exp || payload.exp <= now) return null;
+    if (!payload?.sub || payload?.iss !== TOKEN_ISSUER || !payload?.exp || payload.exp <= now) return null;
     return payload;
   } catch {
     return null;

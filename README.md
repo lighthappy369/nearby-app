@@ -79,7 +79,7 @@ Döndürülen her aday için:
 - `iceBreakers`
 
 ### 4) Eşleşme oluştur
-`POST /matches`
+`POST /matches` (Bearer token gerekli, `userA` sahibi veya admin)
 
 ```json
 {
@@ -118,13 +118,15 @@ Döndürülen her aday için:
 `GET /me`
 
 ### 11) Stripe webhook
-`POST /stripe/webhook`
+`POST /stripe/webhook` (`x-stripe-signature` zorunlu, hatalı JSON -> 400)
 
 ### 12) Event tracking
 `POST /events` (Bearer token gerekli), `GET /events` (admin token gerekli)
 
 ### 13) Foto analiz (beta)
 `POST /photo/analyze`
+
+Not: Demo/heuristic sonuç döndürür; production ML pipeline yerine geçmez.
 
 ## Monetizasyon için bir sonraki teknik adımlar
 

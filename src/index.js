@@ -99,6 +99,22 @@ function sanitizeLocation(location) {
   return { lat, lon };
 }
 
+
+function parseJsonBuffer(rawBody) {
+  if (!rawBody?.length) {
+    const error = new Error('invalid JSON');
+    error.status = 400;
+    throw error;
+  }
+  try {
+    return JSON.parse(rawBody.toString('utf8'));
+  } catch {
+    const error = new Error('invalid JSON');
+    error.status = 400;
+    throw error;
+  }
+}
+
 function verifyWebhookSignature(signature, rawBody) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) return false;
@@ -198,7 +214,7 @@ async function handler(req, res) {
         return sendJson(res, 401, { error: 'invalid webhook signature.' });
       }
 
-      const { type, data = {} } = JSON.parse(rawBody.toString('utf8'));
+      const { type, data = {} } = parseJsonBuffer(rawBody);
       if (type === 'checkout.session.completed') {
         const userId = data?.metadata?.userId;
         if (userId) setSubscription(userId, 'active', { provider: 'stripe', plan: data?.metadata?.plan || 'monthly' });
@@ -291,7 +307,13 @@ async function handler(req, res) {
     }
 
     if (method === 'POST' && path === '/matches') {
+      const caller = authUser(req);
+      if (!caller) return sendJson(res, 401, { error: 'unauthorized.' });
+
       const { userA, userB } = await readBody(req);
+      if (!userA || !userB) return sendJson(res, 400, { error: 'userA and userB are required.' });
+      if (!isOwnerOrAdmin(caller, userA)) return sendJson(res, 403, { error: 'forbidden.' });
+
       const first = findUserById(userA);
       const second = findUserById(userB);
       if (!first || !second) return sendJson(res, 404, { error: 'Both users must exist.' });
