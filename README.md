@@ -1,84 +1,212 @@
-Project Name: Yakindakiler - Anonymous Matching and Chat Application
-Project Overview: "Yakindakiler" is an innovative mobile application designed to facilitate anonymous matching and meaningful conversations. This app provides users with the opportunity to connect with others based on personality traits and interests without revealing their identity until they feel comfortable. The app's goal is to create a safe, secure, and authentic environment where users can form genuine connections, potentially leading to lasting relationships.
+# empati
 
-Key Features:
+AI destekli anonim eşleşme ve sohbet uygulaması için MVP API.
 
-Anonymous Registration and User Profiles:
+## Ne geliştirildi?
 
-Users can register without providing personal information, ensuring complete anonymity.
-During registration, users answer a series of questions that help create a psychological profile, which the AI uses for matching.
-Profiles are created based on these responses and personality traits, without including personal identifiers such as names or photos initially.
-AI-Powered Matching:
+Bu sürümde, talebinize uygun şekilde uygulama **AI destekli** olacak şekilde teknik bir temel oluşturuldu:
 
-The app uses advanced AI algorithms to analyze users' personality traits and preferences, matching them with compatible individuals.
-Matching is based on deep personality analysis, ensuring that users are connected with others who share similar values, interests, and emotional compatibility.
-The AI ensures that matches are meaningful, focusing on long-term compatibility rather than superficial attributes.
-Secure and Anonymous Chat:
+- Anonim kullanıcı oluşturma (`15+` yaş kontrolü)
+- İlgi alanı + değerler + yaşam tarzı + konum odaklı uyumluluk skoru
+- AI açıklaması (neden bu eşleşme önerildi)
+- AI sohbet açılış cümleleri (ice-breaker önerileri)
+- Eşleşme oluşturma ve kullanıcı eşleşmelerini listeleme
 
-Users can engage in conversations with their matches while remaining completely anonymous for the first week.
-During this period, personal information or contact details cannot be shared, ensuring privacy and security.
-After one week of anonymous communication, users can choose to share a single photo if both parties are comfortable.
-Privacy and Security:
+> Not: Bu MVP sürümü in-memory veri deposu kullanır. Sonraki adımda PostgreSQL/MongoDB + gerçek auth + ödeme altyapısına geçilir.
 
-The app employs industry-standard security practices, including end-to-end encryption for all communications and data storage.
-Personal information, even if voluntarily shared later, is protected with robust encryption methods.
-Strict policies are in place to prevent the sharing of personal information during the anonymous period, with immediate account suspension for any violations.
-Time-Limited Introduction:
+## Teknoloji
 
-The app is designed for a one-month interaction period, allowing users to build a connection at a comfortable pace.
-At the end of the month, users have the option to initiate a video call, enabling them to take their relationship to the next level.
-This limited-time framework encourages users to focus on getting to know each other genuinely, without rushing into a relationship.
-App Infrastructure:
+- Node.js
+- Node.js HTTP server (dependency-free)
+- Native test runner (`node --test`)
 
-Frontend: Developed using React Native, ensuring seamless performance on both iOS and Android devices.
-Backend: Powered by a robust API built with Node.js and MongoDB, providing a scalable and responsive backend.
-Security: The application utilizes JWT (JSON Web Token) for secure authentication and bcrypt for password hashing, ensuring user credentials are safely stored and managed.
-Security Measures:
+## Kurulum
 
-End-to-End Encryption:
+```bash
+npm install
+npm start
+```
 
-All communications within the app are secured with end-to-end encryption, meaning only the sender and receiver can read the messages.
-Even the app's servers cannot decrypt the content of the messages, ensuring absolute privacy.
-Secure Authentication:
+API varsayılan olarak `http://localhost:3000` üzerinde çalışır.
 
-User authentication is managed using JWT, which securely stores and manages user sessions.
-Passwords are hashed using bcrypt, a powerful cryptographic algorithm, making it nearly impossible for attackers to reverse-engineer user passwords.
-Anonymity Enforcement:
+## Test
 
-The app enforces a strict anonymity period, where users are not allowed to share personal details or images.
-Any attempt to breach this rule results in immediate suspension or banning, ensuring the safety and privacy of all users.
-AI-Based Monitoring:
-
-AI tools are implemented to monitor conversations for any signs of inappropriate behavior or attempts to breach anonymity.
-This proactive approach helps maintain a respectful and secure environment for all users.
-Genuine Connections and True Love:
-
-Deep Compatibility Matching: Unlike traditional dating apps that often focus on physical appearance, Yakindakiler prioritizes emotional and psychological compatibility. By matching users based on personality traits and values, the app increases the chances of forming deep, meaningful connections that have the potential to develop into true love.
-
-Focus on Real Communication: The one-week anonymity period allows users to focus on conversation and getting to know each other’s personalities, without the influence of looks or social status. This approach encourages users to build connections based on mutual understanding and respect.
-
-Time for Reflection: The one-month interaction period gives users the time to genuinely evaluate their feelings and the compatibility of their match, reducing the pressure to make hasty decisions. This helps in forming stronger, more thoughtful connections that can lead to lasting relationships.
-
-Target Audience:
-
-Individuals seeking meaningful, long-term relationships based on deep emotional and psychological compatibility.
-Users who value privacy and wish to explore connections anonymously before revealing their identity.
-People who are cautious about online dating and prefer a secure, controlled environment to meet new people.
-Project Goals:
-
-To create a safe and secure platform where users can anonymously meet and build connections based on their true selves.
-To foster meaningful relationships by prioritizing personality and emotional compatibility over superficial traits.
-To ensure user privacy and security through state-of-the-art encryption and strict anonymity enforcement.
-Yakindakiler is more than just a dating app; it’s a platform designed to help users find true, lasting connections in a safe, private, and respectful environment. Whether you're looking for friendship, a serious relationship, or just someone to talk to, Yakindakiler is here to make sure your interactions are meaningful and genuine.
+```bash
+npm test
+```
 
 
 
+## Web Arayüz Akışı
+
+Uygulama artık basit debug panel yerine funnel odaklı web akışı sunar:
+
+- `http://localhost:3000/` veya `/tr` : Türkçe premium giriş ekranı
+- `http://localhost:3000/ar` : Arapça premium giriş ekranı
+- `http://localhost:3000/en` : İngilizce premium giriş ekranı
+- `http://localhost:3000/de` : Almanca premium giriş ekranı
+- `http://localhost:3000/ru` : Rusça premium giriş ekranı
+- `http://localhost:3000/personality-test` veya `/personality-test-tr` : TR kişilik testi (30 soru + foto analiz beta)
+- `http://localhost:3000/personality-test-ar` : AR kişilik testi (30 soru + foto analiz beta)
+- `http://localhost:3000/personality-test-en` : EN kişilik testi (30 soru + foto analiz beta)
+- `http://localhost:3000/personality-test-de` : DE kişilik testi (30 soru + foto analiz beta)
+- `http://localhost:3000/personality-test-ru` : RU kişilik testi (30 soru + foto analiz beta)
+- `http://localhost:3000/launch` : Stripe odaklı landing ekranı
+- `http://localhost:3000/community` : anonim topluluk sohbeti + AI derinlik analizi
+- `http://localhost:3000/privacy` ve `/impressum` : yasal sayfalar
+
+## API Uç Noktaları
+
+### 1) Sağlık kontrolü
+`GET /health`
+
+### 2) Kullanıcı oluştur
+`POST /users`
+
+Örnek gövde:
+
+```json
+{
+  "age": 24,
+  "language": "tr",
+  "interests": ["music", "travel", "fitness"],
+  "values": ["honesty", "family"],
+  "lifestyle": ["early-riser"],
+  "location": { "lat": 52.52, "lon": 13.40 }
+}
+```
+
+### 3) Önerilen eşleşmeleri getir
+`GET /users/:id/recommendations` (Bearer token gerekli, owner/admin)
+
+Döndürülen her aday için:
+- `score` (0-100)
+- `breakdown` (interest/values/lifestyle/location)
+- `aiReason`
+- `iceBreakers`
+
+### 4) Eşleşme oluştur
+`POST /matches` (Bearer token gerekli, `userA` sahibi veya admin)
+
+```json
+{
+  "userA": "uuid-a",
+  "userB": "uuid-b"
+}
+```
+
+### 5) Kullanıcının eşleşmelerini getir
+`GET /users/:id/matches` (Bearer token gerekli, owner/admin)
+
+### 6) Jung soruları
+`GET /jung/questions`
+
+### 7) Jung skorla
+`POST /jung/score`
+
+Örnek gövde:
+
+```json
+{
+  "answers": [
+    { "id": "q1", "value": 5 },
+    { "id": "q2", "value": 3 }
+  ]
+}
+```
+
+### 8) Auth register
+`POST /auth/register`
+
+### 9) Auth login
+`POST /auth/login`
+
+### 10) Me (token gerekli)
+`GET /me`
+
+### 11) Stripe webhook
+`POST /stripe/webhook` (`x-stripe-signature` zorunlu, hatalı JSON -> 400)
+
+### 12) Event tracking
+`POST /events` (Bearer token gerekli), `GET /events` (admin token gerekli)
+
+### 13) Foto analiz (beta)
+`POST /photo/analyze`
+
+Not: Demo/heuristic sonuç döndürür; production ML pipeline yerine geçmez.
+
+### 14) Community mesajları (anonim sohbet)
+`GET /community/messages`, `POST /community/messages`
+
+### 15) Güvenlik ajanları
+`POST /security/scan`
+
+### 16) AI ruh derinlik analizi
+`POST /ai/depth-analysis`
+
+## Monetizasyon için bir sonraki teknik adımlar
+
+1. Stripe/RevenueCat ile abonelik katmanı
+2. Paywall kural motoru (free limit + premium unlock)
+3. Event tracking (activation, D1/D7, ARPU, churn)
+4. Moderasyon & trust-safety pipeline
+5. Veritabanı + cache + kuyruk altyapısı
+
+## Kod dışa aktarma
+
+```bash
+git archive --format=zip --output empati.zip HEAD
+```
 
 
+## Para Odaklı İletişim Metinleri
+
+Yatırımcı sunumu, landing page ve abonelik açıklaması için hazır TR metin seti eklendi:
+
+- `docs/monetization-copy-tr.md`
+
+Bu dosyada 3 farklı ton (profesyonel, kısa pazarlama, pitch deck) ve doğrudan kullanılabilir şablonlar bulunur.
 
 
+## Day 1 Launch Paket
+
+Hızlı gelir doğrulaması için landing sayfası eklendi:
+
+- `http://localhost:3000/launch`
+- Stripe ödeme linki için env: `STRIPE_PAYMENT_LINK`
+
+Ayrıca Jung tabanlı test MVP endpointleri eklendi:
+
+- `GET /jung/questions`
+- `POST /jung/score`
 
 
+## Production Skeleton (DB + Auth + Stripe Webhook)
 
-# nearby-app
-Anonymous chat application built with Node.js and MongoDB
+Bu sürümde production'a geçiş için temel iskelet endpointleri eklendi:
+
+- `POST /auth/register`
+- `POST /auth/login`
+- `GET /me` (Bearer token)
+- `POST /stripe/webhook`
+- `POST /events`
+- `GET /events`
+- `POST /moderation/report`
+
+Stripe webhook ve auth güvenliği için gerekli env:
+
+- `AUTH_SECRET` (test dışında zorunlu)
+- `STRIPE_WEBHOOK_SECRET` (header: `x-stripe-signature`)
+
+Not: Bu hâlâ in-memory iskelettir; sonraki adım PostgreSQL + migration katmanıdır.
+
+
+## Stripe placeholder kontrolü
+
+Landing sayfasında sabit `STRIPE_PAYMENT_LINK_HERE` kullanılmaz; sunucu `STRIPE_PAYMENT_LINK` env değişkenini `__STRIPE_PAYMENT_LINK__` yerine enjekte eder.
+
+Kontrol komutu:
+
+```bash
+rg "STRIPE_PAYMENT_LINK_HERE|__STRIPE_PAYMENT_LINK__" public
+```

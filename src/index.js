@@ -1,0 +1,415 @@
+import http from 'node:http';
+import { randomUUID, timingSafeEqual } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
+import {
+  saveUser,
+  findUserById,
+  findUserByEmail,
+  listOtherUsers,
+  saveMatch,
+  listMatchesForUser,
+  setSubscription,
+  getSubscription,
+  saveEvent,
+  listEvents,
+  saveCommunityMessage,
+  listCommunityMessages
+} from './data/store.js';
+import { rankCandidates, calculateCompatibility } from './services/matchEngine.js';
+import { generateIceBreakers, explainScore } from './services/aiCoach.js';
+import { listJungQuestions, scoreJungAnswers } from './services/jungEngine.js';
+import { makeSalt, hashPassword, createToken, verifyToken, bearerToken } from './services/auth.js';
+import { validateEventName } from './services/tracking.js';
+import { analyzeSoulDepth } from './services/depthAnalyzer.js';
+import { runSecurityAgents } from './services/securityAgents.js';
+
+function sendJson(res, status, payload) {
+  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify(payload));
+}
+
+function sendHtml(res, status, html) {
+  res.writeHead(status, { 'Content-Type': 'text/html; charset=utf-8' });
+  res.end(html);
+}
+
+function parsePath(url) {
+  return url.split('?')[0].replace(/\/+$/, '') || '/';
+}
+
+async function readRawBody(req) {
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  return Buffer.concat(chunks);
+}
+
+async function readBody(req) {
+  const raw = await readRawBody(req);
+  if (!raw.length) return {};
+  try {
+    return JSON.parse(raw.toString('utf8'));
+  } catch {
+    const error = new Error('invalid JSON');
+    error.status = 400;
+    throw error;
+  }
+}
+
+async function serveHome(res) {
+  const html = await readFile(new URL('../public/index.html', import.meta.url), 'utf8');
+  return sendHtml(res, 200, html);
+}
+
+async function serveLaunch(res) {
+  let html = await readFile(new URL('../public/launch.html', import.meta.url), 'utf8');
+  html = html.replace('__STRIPE_PAYMENT_LINK__', process.env.STRIPE_PAYMENT_LINK || '#');
+  return sendHtml(res, 200, html);
+}
+
+async function serveStatic(res, fileName, contentType = 'text/plain; charset=utf-8') {
+  const file = await readFile(new URL(`../public/${fileName}`, import.meta.url), 'utf8');
+  res.writeHead(200, { 'Content-Type': contentType });
+  res.end(file);
+}
+
+function authUser(req) {
+  const token = bearerToken(req);
+  const payload = verifyToken(token);
+  if (!payload?.sub) return null;
+  const user = findUserById(payload.sub);
+  return user ? { ...user, tokenPayload: payload } : null;
+}
+
+function isOwnerOrAdmin(actor, ownerId) {
+  return actor && (actor.id === ownerId || actor.role === 'admin');
+}
+
+function sanitizeStringArray(value) {
+  if (value == null) return [];
+  if (!Array.isArray(value)) return null;
+  const items = value
+    .filter((entry) => typeof entry === 'string')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  return items;
+}
+
+function sanitizeLocation(location) {
+  if (location == null) return null;
+  const lat = Number(location.lat);
+  const lon = Number(location.lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+  return { lat, lon };
+}
+
+
+function parseJsonBuffer(rawBody) {
+  if (!rawBody?.length) {
+    const error = new Error('invalid JSON');
+    error.status = 400;
+    throw error;
+  }
+  try {
+    return JSON.parse(rawBody.toString('utf8'));
+  } catch {
+    const error = new Error('invalid JSON');
+    error.status = 400;
+    throw error;
+  }
+}
+
+function verifyWebhookSignature(signature, rawBody) {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!secret) return false;
+  const expected = Buffer.from(secret);
+  const received = Buffer.from(String(signature || ''));
+  if (expected.length !== received.length) return false;
+  if (!timingSafeEqual(expected, received)) return false;
+  return rawBody.length > 0;
+}
+
+async function handler(req, res) {
+  const path = parsePath(req.url);
+  const method = req.method;
+
+  try {
+    if (method === 'GET' && path === '/') return serveStatic(res, 'index-tr.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/tr') return serveStatic(res, 'index-tr.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/en') return serveStatic(res, 'index-en.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/de') return serveStatic(res, 'index-de.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/ru') return serveStatic(res, 'index-ru.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/ar') return serveStatic(res, 'index-ar.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/launch') return serveLaunch(res);
+    if (method === 'GET' && path === '/personality-test') return serveStatic(res, 'personality-test-tr.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/personality-test-tr') return serveStatic(res, 'personality-test-tr.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/personality-test-en') return serveStatic(res, 'personality-test-en.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/personality-test-de') return serveStatic(res, 'personality-test-de.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/personality-test-ru') return serveStatic(res, 'personality-test-ru.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/personality-test-ar') return serveStatic(res, 'personality-test-ar.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/privacy') return serveStatic(res, 'privacy.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/impressum') return serveStatic(res, 'impressum.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/style.css') return serveStatic(res, 'style.css', 'text/css; charset=utf-8');
+    if (method === 'GET' && path === '/script.js') return serveStatic(res, 'script.js', 'application/javascript; charset=utf-8');
+    if (method === 'GET' && path === '/personality.js') return serveStatic(res, 'personality.js', 'application/javascript; charset=utf-8');
+    if (method === 'GET' && path === '/community') return serveStatic(res, 'community.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/community.js') return serveStatic(res, 'community.js', 'application/javascript; charset=utf-8');
+
+    if (method === 'GET' && path === '/health') {
+      return sendJson(res, 200, { ok: true, service: 'empati-ai-mvp' });
+    }
+
+    if (method === 'POST' && path === '/auth/register') {
+      const { email, password, age = 18, language = 'tr' } = await readBody(req);
+      if (!email || !password) return sendJson(res, 400, { error: 'email and password required.' });
+      if (findUserByEmail(email)) return sendJson(res, 409, { error: 'email already used.' });
+      if (!Number.isFinite(Number(age)) || Number(age) < 15) return sendJson(res, 400, { error: 'Minimum age is 15.' });
+
+      const salt = makeSalt();
+      const user = saveUser({
+        id: randomUUID(),
+        role: 'user',
+        email: String(email).trim().toLowerCase(),
+        passwordHash: hashPassword(password, salt),
+        salt,
+        age: Number(age),
+        language,
+        interests: [],
+        values: [],
+        lifestyle: [],
+        createdAt: new Date().toISOString()
+      });
+
+      const token = createToken({ sub: user.id, email: user.email, role: user.role });
+      return sendJson(res, 201, { token, user: { id: user.id, email: user.email, age: user.age } });
+    }
+
+    if (method === 'POST' && path === '/auth/login') {
+      const { email, password } = await readBody(req);
+      const user = findUserByEmail(email);
+      if (!user) return sendJson(res, 401, { error: 'invalid credentials.' });
+      const ok = hashPassword(password, user.salt) === user.passwordHash;
+      if (!ok) return sendJson(res, 401, { error: 'invalid credentials.' });
+      const token = createToken({ sub: user.id, email: user.email, role: user.role || 'user' });
+      return sendJson(res, 200, { token, user: { id: user.id, email: user.email, age: user.age } });
+    }
+
+    if (method === 'GET' && path === '/me') {
+      const user = authUser(req);
+      if (!user) return sendJson(res, 401, { error: 'unauthorized.' });
+      return sendJson(res, 200, {
+        user: { id: user.id, email: user.email, role: user.role || 'user', age: user.age, language: user.language },
+        subscription: getSubscription(user.id)
+      });
+    }
+
+    if (method === 'POST' && path === '/events') {
+      const user = authUser(req);
+      if (!user) return sendJson(res, 401, { error: 'unauthorized.' });
+
+      const { name, metadata = {} } = await readBody(req);
+      if (!validateEventName(name)) return sendJson(res, 400, { error: 'unsupported event name.' });
+      const row = saveEvent({ userId: user.id, name, metadata });
+      return sendJson(res, 201, row);
+    }
+
+    if (method === 'GET' && path === '/events') {
+      const user = authUser(req);
+      if (!user) return sendJson(res, 401, { error: 'unauthorized.' });
+      if (user.role !== 'admin') return sendJson(res, 403, { error: 'admin access required.' });
+      return sendJson(res, 200, { items: listEvents(100) });
+    }
+
+    if (method === 'POST' && path === '/stripe/webhook') {
+      const rawBody = await readRawBody(req);
+      const signature = req.headers['x-stripe-signature'];
+      if (!verifyWebhookSignature(signature, rawBody)) {
+        return sendJson(res, 401, { error: 'invalid webhook signature.' });
+      }
+
+      const { type, data = {} } = parseJsonBuffer(rawBody);
+      if (type === 'checkout.session.completed') {
+        const userId = data?.metadata?.userId;
+        if (userId) setSubscription(userId, 'active', { provider: 'stripe', plan: data?.metadata?.plan || 'monthly' });
+      }
+
+      if (type === 'customer.subscription.deleted') {
+        const userId = data?.metadata?.userId;
+        if (userId) setSubscription(userId, 'canceled', { provider: 'stripe' });
+      }
+
+      return sendJson(res, 200, { received: true, type });
+    }
+
+    if (method === 'GET' && path === '/jung/questions') {
+      return sendJson(res, 200, { items: listJungQuestions() });
+    }
+
+    if (method === 'POST' && path === '/jung/score') {
+      const { answers = [] } = await readBody(req);
+      if (!Array.isArray(answers)) return sendJson(res, 422, { error: 'answers must be an array.' });
+      const result = scoreJungAnswers(answers);
+      if (answers.length > 0) {
+        saveEvent({ userId: null, name: 'test_completed', metadata: { type: result.type, completionRate: result.quality.completionRate } });
+      }
+      return sendJson(res, 200, result);
+    }
+
+    if (method === 'POST' && path === '/photo/analyze') {
+      const { name = '', size = 0, type = '' } = await readBody(req);
+      return sendJson(res, 200, {
+        ok: true,
+        mode: 'beta-demo',
+        input: { name, size, type },
+        traits: {
+          warmth: 78,
+          confidence: 66,
+          creativity: 71,
+          socialEnergy: 64
+        },
+        note: 'Photo analysis is currently a beta heuristic output.'
+      });
+    }
+
+    if (method === 'POST' && path === '/security/scan') {
+      const { text = '' } = await readBody(req);
+      return sendJson(res, 200, runSecurityAgents(text));
+    }
+
+    if (method === 'POST' && path === '/ai/depth-analysis') {
+      const { text = '', jung = null } = await readBody(req);
+      const security = runSecurityAgents(text);
+      return sendJson(res, 200, {
+        security,
+        analysis: analyzeSoulDepth({ text, jung })
+      });
+    }
+
+    if (method === 'GET' && path === '/community/messages') {
+      return sendJson(res, 200, { items: listCommunityMessages(150) });
+    }
+
+    if (method === 'POST' && path === '/community/messages') {
+      const { alias = 'Anon', text = '', lang = 'tr' } = await readBody(req);
+      if (!String(text).trim()) return sendJson(res, 400, { error: 'text required.' });
+      const security = runSecurityAgents(text);
+      if (!security.safeToPublish) {
+        return sendJson(res, 422, {
+          error: 'message blocked by security agents.',
+          security
+        });
+      }
+
+      const row = saveCommunityMessage({ alias: String(alias).slice(0, 40), text: String(text).slice(0, 500), lang, security });
+      return sendJson(res, 201, row);
+    }
+
+    if (method === 'POST' && path === '/users') {
+      const { age, language, interests = [], values = [], lifestyle = [], location } = await readBody(req);
+      const parsedAge = Number(age);
+      if (!Number.isFinite(parsedAge) || parsedAge < 15) return sendJson(res, 400, { error: 'Minimum age is 15.' });
+
+      const nextInterests = sanitizeStringArray(interests);
+      const nextValues = sanitizeStringArray(values);
+      const nextLifestyle = sanitizeStringArray(lifestyle);
+      if (!nextInterests || !nextValues || !nextLifestyle) {
+        return sendJson(res, 422, { error: 'interests, values and lifestyle must be arrays of strings.' });
+      }
+
+      const nextLocation = sanitizeLocation(location);
+      if (location && !nextLocation) return sendJson(res, 422, { error: 'location must include valid lat/lon.' });
+
+      const user = {
+        id: randomUUID(),
+        role: 'user',
+        age: parsedAge,
+        language,
+        interests: nextInterests,
+        values: nextValues,
+        lifestyle: nextLifestyle,
+        location: nextLocation,
+        createdAt: new Date().toISOString()
+      };
+      saveUser(user);
+      return sendJson(res, 201, user);
+    }
+
+    const recMatch = path.match(/^\/users\/([^/]+)\/recommendations$/);
+    if (method === 'GET' && recMatch) {
+      const caller = authUser(req);
+      if (!isOwnerOrAdmin(caller, recMatch[1])) return sendJson(res, 403, { error: 'forbidden.' });
+
+      const user = findUserById(recMatch[1]);
+      if (!user) return sendJson(res, 404, { error: 'User not found.' });
+
+      const items = rankCandidates(user, listOtherUsers(user.id)).slice(0, 20).map(({ candidate, score, breakdown }) => ({
+        candidateId: candidate.id,
+        score,
+        breakdown,
+        aiReason: explainScore(breakdown),
+        iceBreakers: generateIceBreakers(user, candidate, breakdown)
+      }));
+      return sendJson(res, 200, { total: items.length, items });
+    }
+
+    if (method === 'POST' && path === '/matches') {
+      const caller = authUser(req);
+      if (!caller) return sendJson(res, 401, { error: 'unauthorized.' });
+
+      const { userA, userB } = await readBody(req);
+      if (!userA || !userB) return sendJson(res, 400, { error: 'userA and userB are required.' });
+      if (!isOwnerOrAdmin(caller, userA)) return sendJson(res, 403, { error: 'forbidden.' });
+
+      const first = findUserById(userA);
+      const second = findUserById(userB);
+      if (!first || !second) return sendJson(res, 404, { error: 'Both users must exist.' });
+
+      const { score, breakdown } = calculateCompatibility(first, second);
+      const match = saveMatch({ id: randomUUID(), userA, userB, score, breakdown, createdAt: new Date().toISOString() });
+      return sendJson(res, 201, {
+        ...match,
+        aiReason: explainScore(breakdown),
+        suggestedOpeners: generateIceBreakers(first, second, breakdown)
+      });
+    }
+
+    const userMatch = path.match(/^\/users\/([^/]+)\/matches$/);
+    if (method === 'GET' && userMatch) {
+      const caller = authUser(req);
+      if (!isOwnerOrAdmin(caller, userMatch[1])) return sendJson(res, 403, { error: 'forbidden.' });
+
+      const user = findUserById(userMatch[1]);
+      if (!user) return sendJson(res, 404, { error: 'User not found.' });
+      return sendJson(res, 200, { items: listMatchesForUser(user.id) });
+    }
+
+    if (method === 'POST' && path === '/moderation/report') {
+      const reporter = authUser(req);
+      if (!reporter) return sendJson(res, 401, { error: 'unauthorized.' });
+
+      const { targetUserId, reason } = await readBody(req);
+      if (!targetUserId || !reason) return sendJson(res, 400, { error: 'targetUserId and reason required.' });
+      const row = saveEvent({ userId: reporter.id, name: 'moderation_report', metadata: { targetUserId, reason } });
+      return sendJson(res, 201, row);
+    }
+
+    return sendJson(res, 404, { error: 'Route not found.' });
+  } catch (error) {
+    if (error?.status) return sendJson(res, error.status, { error: error.message });
+    return sendJson(res, 500, { error: 'Internal error.' });
+  }
+}
+
+const server = http.createServer(handler);
+const port = process.env.PORT || 3000;
+if (process.env.NODE_ENV !== 'test') {
+  if (!process.env.AUTH_SECRET) {
+    throw new Error('AUTH_SECRET is required outside test mode.');
+  }
+
+  server.listen(port, () => {
+    console.log(`empati api running on :${port}`);
+  });
+}
+
+export { handler };

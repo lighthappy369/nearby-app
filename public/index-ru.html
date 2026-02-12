@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Empati Berlin | Научный мэтчинг</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">EMPATI<span>BERLIN</span></div>
+    <div class="nav-links">
+      <span>Уже зарегистрированы?</span>
+      <a href="/launch" class="btn-outline">Войти</a>
+    </div>
+  </header>
+
+  <main class="hero-section">
+    <div class="container">
+      <section class="registration-card">
+        <h1>Не оставляйте счастье на случай.</h1>
+        <p>Найдите свою родственную душу с помощью научного анализа.</p>
+        <form id="start-form" data-next="/personality-test-ru">
+          <label>Я...</label>
+          <div class="gender-selector" data-group="self">
+            <button type="button" class="opt-btn">Женщина</button>
+            <button type="button" class="opt-btn">Мужчина</button>
+          </div>
+          <label>Я ищу...</label>
+          <div class="gender-selector" data-group="target">
+            <button type="button" class="opt-btn">Мужчину</button>
+            <button type="button" class="opt-btn">Женщину</button>
+          </div>
+          <button type="submit" class="btn-main">НАЧАТЬ БЕСПЛАТНО И ПРОЙТИ ТЕСТ</button>
+        </form>
+      </section>
+      <section class="visual-side">
+        <div class="orbit-box" aria-label="карта орбитального мэтчинга">
+          <div class="ring ring-one"></div><div class="ring ring-two"></div><div class="ring ring-three"></div>
+          <div class="core-avatar"><img src="https://i.pravatar.cc/180?u=empati-premium-ru" alt="Пример профиля" /></div>
+          <div class="orbit-dot dot-a"></div><div class="orbit-dot dot-b"></div><div class="orbit-dot dot-c"></div>
+        </div>
+        <div class="stat-text"><h3>90%+ потенциал совпадения</h3><p>Ценности, интересы и ритм общения в одном экране.</p></div>
+      </section>
+    </div>
+  </main>
+
+  <section class="next-step">
+    <h2>Следующий шаг: личностный тест</h2>
+    <p>Пройдите тест, узнайте архетип и улучшите качество мэтчинга.</p>
+    <a class="btn-secondary" href="/personality-test-ru">К тесту</a>
+    <p style="margin-top:14px"><a href="/privacy">Privacy</a> · <a href="/impressum">Impressum</a> · <a href="/tr">TR</a> · <a href="/en">EN</a> · <a href="/ar">AR</a></p>
+  </section>
+
+  <section class="next-step" style="margin-top:0">
+    <p><a href="/community">Community Chat</a></p>
+  </section>
+
+  <script src="/script.js"></script>
+</body>
+</html>

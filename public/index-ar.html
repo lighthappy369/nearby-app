@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Empati Berlin | مطابقة علمية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">EMPATI<span>BERLIN</span></div>
+    <div class="nav-links">
+      <span>هل لديك حساب؟</span>
+      <a href="/launch" class="btn-outline">تسجيل الدخول</a>
+    </div>
+  </header>
+
+  <main class="hero-section">
+    <div class="container">
+      <section class="registration-card">
+        <h1>لا تترك سعادتك للصدفة.</h1>
+        <p>اعثر على شريك روحك عبر تحليل علمي.</p>
+        <form id="start-form" data-next="/personality-test-ar">
+          <label>أنا...</label>
+          <div class="gender-selector" data-group="self">
+            <button type="button" class="opt-btn">امرأة</button>
+            <button type="button" class="opt-btn">رجل</button>
+          </div>
+          <label>أبحث عن...</label>
+          <div class="gender-selector" data-group="target">
+            <button type="button" class="opt-btn">رجل</button>
+            <button type="button" class="opt-btn">امرأة</button>
+          </div>
+          <button type="submit" class="btn-main">ابدأ مجانًا وابدأ الاختبار</button>
+        </form>
+      </section>
+      <section class="visual-side">
+        <div class="orbit-box" aria-label="خريطة مدار التطابق">
+          <div class="ring ring-one"></div><div class="ring ring-two"></div><div class="ring ring-three"></div>
+          <div class="core-avatar"><img src="https://i.pravatar.cc/180?u=empati-premium-ar" alt="ملف شخصي" /></div>
+          <div class="orbit-dot dot-a"></div><div class="orbit-dot dot-b"></div><div class="orbit-dot dot-c"></div>
+        </div>
+        <div class="stat-text"><h3>إمكانات تطابق +90%</h3><p>شاهد القيم والاهتمامات ونمط التواصل في شاشة واحدة.</p></div>
+      </section>
+    </div>
+  </main>
+
+  <section class="next-step">
+    <h2>الخطوة التالية: اختبار الشخصية</h2>
+    <p>أكمل الاختبار، اكتشف نمطك، وحسّن جودة التطابق.</p>
+    <a class="btn-secondary" href="/personality-test-ar">ابدأ الاختبار</a>
+    <p style="margin-top:14px"><a href="/privacy">Privacy</a> · <a href="/impressum">Impressum</a> · <a href="/tr">TR</a> · <a href="/en">EN</a> · <a href="/de">DE</a> · <a href="/ru">RU</a></p>
+  </section>
+
+  <section class="next-step" style="margin-top:0">
+    <p><a href="/community">Community Chat</a></p>
+  </section>
+
+  <script src="/script.js"></script>
+</body>
+</html>

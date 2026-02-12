@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru" data-lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Empati | Личностный тест</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .test-wrap { max-width: 900px; margin: 36px auto 60px; padding: 0 16px; }
+    .test-card { background:#fff; border:1px solid #e8e8e8; border-radius:10px; padding:22px; margin-bottom:14px; }
+    .scale { display:grid; grid-template-columns: repeat(5, minmax(44px, 1fr)); gap:8px; margin-top:12px; }
+    .scale button { border:1px solid #ccc; padding:10px; border-radius:8px; background:#fff; cursor:pointer; }
+    .scale button.active { border-color: var(--empati-red); color: var(--empati-red); background:#fff5f6; }
+    .muted { color:#666; font-size:14px; }
+    pre { background:#111827; color:#f9fafb; padding:12px; border-radius:8px; overflow:auto; }
+  </style>
+</head>
+<body>
+<header class="navbar"><div class="logo">EMPATI<span>BERLIN</span></div><div class="nav-links"><a href="/ru" class="btn-outline">Главная</a></div></header>
+<main class="test-wrap">
+  <section class="test-card">
+    <h1>Личностный тест (30 вопросов)</h1>
+    <p>Оцените каждый вопрос от 1 (не согласен) до 5 (согласен).</p>
+    <p class="muted" id="progress">Загрузка...</p>
+  </section>
+  <div id="questions"></div>
+  <section class="test-card">
+    <h3>Анализ фото (Beta)</h3>
+    <input id="photoInput" type="file" accept="image/*" />
+    <button id="photoBtn" class="btn-main" style="max-width:260px;margin-top:10px">Анализ фото</button>
+    <pre id="photoOut">Пока нет анализа.</pre>
+  </section>
+  <section class="test-card">
+    <button id="submitBtn" class="btn-main" style="max-width:280px;">Анализировать тест</button>
+    <pre id="result">Пока нет результата.</pre>
+  </section>
+</main>
+<script src="/personality.js"></script>
+</body>
+</html>
