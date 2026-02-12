@@ -31,6 +31,12 @@ const copy = {
     answered: (a, t) => `Отвечено: ${a}/${t}.`,
     error: (m) => `Ошибка: ${m}`,
     photoNeed: 'Сначала выберите фото.'
+  },
+  ar: {
+    loaded: (n) => `تم تحميل ${n} سؤالاً.`,
+    answered: (a, t) => `تمت الإجابة: ${a}/${t}.`,
+    error: (m) => `خطأ: ${m}`,
+    photoNeed: 'يرجى اختيار صورة أولاً.'
   }
 }[lang] || {
   loaded: (n) => `${n} questions loaded.`,

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="tr" data-lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Empati | Kişilik Testi</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .test-wrap { max-width: 900px; margin: 36px auto 60px; padding: 0 16px; }
+    .test-card { background:#fff; border:1px solid #e8e8e8; border-radius:10px; padding:22px; margin-bottom:14px; }
+    .scale { display:grid; grid-template-columns: repeat(5, minmax(44px, 1fr)); gap:8px; margin-top:12px; }
+    .scale button { border:1px solid #ccc; padding:10px; border-radius:8px; background:#fff; cursor:pointer; }
+    .scale button.active { border-color: var(--empati-red); color: var(--empati-red); background:#fff5f6; }
+    .muted { color:#666; font-size:14px; }
+    pre { background:#111827; color:#f9fafb; padding:12px; border-radius:8px; overflow:auto; }
+  </style>
+</head>
+<body>
+<header class="navbar"><div class="logo">EMPATİ<span>BERLIN</span></div><div class="nav-links"><a href="/" class="btn-outline">Ana sayfa</a></div></header>
+<main class="test-wrap">
+  <section class="test-card">
+    <h1>Kişilik Testi (30 Soru)</h1>
+    <p>Her soru için 1 (katılmıyorum) ile 5 (katılıyorum) arasında puan verin.</p>
+    <p class="muted" id="progress">Yükleniyor...</p>
+  </section>
+  <div id="questions"></div>
+  <section class="test-card">
+    <h3>Fotoğraf Analizi (Beta)</h3>
+    <input id="photoInput" type="file" accept="image/*" />
+    <button id="photoBtn" class="btn-main" style="max-width:260px;margin-top:10px">Fotoğrafı Analiz Et</button>
+    <pre id="photoOut">Henüz analiz yok.</pre>
+  </section>
+  <section class="test-card">
+    <button id="submitBtn" class="btn-main" style="max-width:280px;">Testi Analiz Et</button>
+    <pre id="result">Henüz sonuç yok.</pre>
+    <p style="margin-top:12px"><a href="/privacy">Privacy</a> · <a href="/impressum">Impressum</a></p>
+  </section>
+</main>
+<script src="/personality.js"></script>
+</body>
+</html>
