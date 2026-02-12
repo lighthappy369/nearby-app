@@ -115,8 +115,13 @@ async function handler(req, res) {
 
   try {
     if (method === 'GET' && path === '/') return serveHome(res);
+    if (method === 'GET' && path === '/tr') return serveHome(res);
+    if (method === 'GET' && path === '/en') return serveStatic(res, 'index-en.html', 'text/html; charset=utf-8');
     if (method === 'GET' && path === '/launch') return serveLaunch(res);
     if (method === 'GET' && path === '/personality-test') return serveStatic(res, 'personality-test.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/personality-test-en') return serveStatic(res, 'personality-test-en.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/privacy') return serveStatic(res, 'privacy.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/impressum') return serveStatic(res, 'impressum.html', 'text/html; charset=utf-8');
     if (method === 'GET' && path === '/style.css') return serveStatic(res, 'style.css', 'text/css; charset=utf-8');
     if (method === 'GET' && path === '/script.js') return serveStatic(res, 'script.js', 'application/javascript; charset=utf-8');
     if (method === 'GET' && path === '/personality.js') return serveStatic(res, 'personality.js', 'application/javascript; charset=utf-8');
@@ -219,6 +224,22 @@ async function handler(req, res) {
         saveEvent({ userId: null, name: 'test_completed', metadata: { type: result.type, completionRate: result.quality.completionRate } });
       }
       return sendJson(res, 200, result);
+    }
+
+    if (method === 'POST' && path === '/photo/analyze') {
+      const { name = '', size = 0, type = '' } = await readBody(req);
+      return sendJson(res, 200, {
+        ok: true,
+        mode: 'beta-demo',
+        input: { name, size, type },
+        traits: {
+          warmth: 78,
+          confidence: 66,
+          creativity: 71,
+          socialEnergy: 64
+        },
+        note: 'Photo analysis is currently a beta heuristic output.'
+      });
     }
 
     if (method === 'POST' && path === '/users') {

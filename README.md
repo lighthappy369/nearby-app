@@ -41,9 +41,12 @@ npm test
 
 Uygulama artık basit debug panel yerine funnel odaklı web akışı sunar:
 
-- `http://localhost:3000/` : premium giriş ekranı (orbit/döngü haritası + kayıt CTA)
-- `http://localhost:3000/personality-test` : Jung tabanlı test ekranı
+- `http://localhost:3000/` veya `/tr` : Türkçe premium giriş ekranı
+- `http://localhost:3000/en` : İngilizce premium giriş ekranı
+- `http://localhost:3000/personality-test` : TR kişilik testi (30 soru + foto analiz beta)
+- `http://localhost:3000/personality-test-en` : EN kişilik testi (30 soru + foto analiz beta)
 - `http://localhost:3000/launch` : Stripe odaklı landing ekranı
+- `http://localhost:3000/privacy` ve `/impressum` : yasal sayfalar
 
 ## API Uç Noktaları
 
@@ -120,6 +123,9 @@ Döndürülen her aday için:
 ### 12) Event tracking
 `POST /events` (Bearer token gerekli), `GET /events` (admin token gerekli)
 
+### 13) Foto analiz (beta)
+`POST /photo/analyze`
+
 ## Monetizasyon için bir sonraki teknik adımlar
 
 1. Stripe/RevenueCat ile abonelik katmanı
@@ -175,3 +181,14 @@ Stripe webhook ve auth güvenliği için gerekli env:
 - `STRIPE_WEBHOOK_SECRET` (header: `x-stripe-signature`)
 
 Not: Bu hâlâ in-memory iskelettir; sonraki adım PostgreSQL + migration katmanıdır.
+
+
+## Stripe placeholder kontrolü
+
+Landing sayfasında sabit `STRIPE_PAYMENT_LINK_HERE` kullanılmaz; sunucu `STRIPE_PAYMENT_LINK` env değişkenini `__STRIPE_PAYMENT_LINK__` yerine enjekte eder.
+
+Kontrol komutu:
+
+```bash
+rg "STRIPE_PAYMENT_LINK_HERE|__STRIPE_PAYMENT_LINK__" public
+```

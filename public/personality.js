@@ -1,13 +1,32 @@
 const questionsRoot = document.getElementById('questions');
 const resultEl = document.getElementById('result');
 const progressEl = document.getElementById('progress');
+const photoOut = document.getElementById('photoOut');
+const photoInput = document.getElementById('photoInput');
+const photoBtn = document.getElementById('photoBtn');
 const answers = new Map();
 
-function renderQuestions(items) {
-  const topTen = items.slice(0, 10);
-  progressEl.textContent = `${topTen.length} soru yüklendi.`;
+const lang = document.documentElement.dataset.lang || 'tr';
+const copy = {
+  tr: {
+    loaded: (n) => `${n} soru yüklendi.`,
+    answered: (a, t) => `${a}/${t} soru cevaplandı.`,
+    error: (m) => `Hata: ${m}`,
+    photoNeed: 'Lütfen önce fotoğraf seçin.'
+  },
+  en: {
+    loaded: (n) => `${n} questions loaded.`,
+    answered: (a, t) => `${a}/${t} questions answered.`,
+    error: (m) => `Error: ${m}`,
+    photoNeed: 'Please select a photo first.'
+  }
+}[lang];
 
-  topTen.forEach((q, index) => {
+function renderQuestions(items) {
+  const all = items;
+  progressEl.textContent = copy.loaded(all.length);
+
+  all.forEach((q, index) => {
     const card = document.createElement('section');
     card.className = 'test-card';
     card.innerHTML = `<h3>${index + 1}. ${q.text}</h3>`;
@@ -23,7 +42,7 @@ function renderQuestions(items) {
         answers.set(q.id, value);
         scale.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
         button.classList.add('active');
-        progressEl.textContent = `${answers.size}/${topTen.length} soru cevaplandı.`;
+        progressEl.textContent = copy.answered(answers.size, all.length);
       });
       scale.appendChild(button);
     }
@@ -54,6 +73,24 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
   resultEl.textContent = JSON.stringify(data, null, 2);
 });
 
+if (photoBtn && photoInput && photoOut) {
+  photoBtn.addEventListener('click', async () => {
+    const file = photoInput.files?.[0];
+    if (!file) {
+      photoOut.textContent = copy.photoNeed;
+      return;
+    }
+
+    const res = await fetch('/photo/analyze', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: file.name, size: file.size, type: file.type })
+    });
+    const data = await res.json();
+    photoOut.textContent = JSON.stringify(data, null, 2);
+  });
+}
+
 init().catch((err) => {
-  progressEl.textContent = `Hata: ${err.message}`;
+  progressEl.textContent = copy.error(err.message);
 });

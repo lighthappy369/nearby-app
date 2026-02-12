@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="tr" data-lang="tr">
+<html lang="en" data-lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Empati | Kişilik Testi</title>
+  <title>Empati | Personality Test</title>
   <link rel="stylesheet" href="/style.css" />
   <style>
     .test-wrap { max-width: 900px; margin: 36px auto 60px; padding: 0 16px; }
@@ -16,24 +16,23 @@
   </style>
 </head>
 <body>
-<header class="navbar"><div class="logo">EMPATİ<span>BERLIN</span></div><div class="nav-links"><a href="/" class="btn-outline">Ana sayfa</a></div></header>
+<header class="navbar"><div class="logo">EMPATI<span>BERLIN</span></div><div class="nav-links"><a href="/en" class="btn-outline">Home</a></div></header>
 <main class="test-wrap">
   <section class="test-card">
-    <h1>Kişilik Testi (30 Soru)</h1>
-    <p>Her soru için 1 (katılmıyorum) ile 5 (katılıyorum) arasında puan verin.</p>
-    <p class="muted" id="progress">Yükleniyor...</p>
+    <h1>Personality Test (30 Questions)</h1>
+    <p>Rate each question from 1 (disagree) to 5 (agree).</p>
+    <p class="muted" id="progress">Loading...</p>
   </section>
   <div id="questions"></div>
   <section class="test-card">
-    <h3>Fotoğraf Analizi (Beta)</h3>
+    <h3>Photo Analysis (Beta)</h3>
     <input id="photoInput" type="file" accept="image/*" />
-    <button id="photoBtn" class="btn-main" style="max-width:260px;margin-top:10px">Fotoğrafı Analiz Et</button>
-    <pre id="photoOut">Henüz analiz yok.</pre>
+    <button id="photoBtn" class="btn-main" style="max-width:260px;margin-top:10px">Analyze Photo</button>
+    <pre id="photoOut">No analysis yet.</pre>
   </section>
   <section class="test-card">
-    <button id="submitBtn" class="btn-main" style="max-width:280px;">Testi Analiz Et</button>
-    <pre id="result">Henüz sonuç yok.</pre>
-    <p style="margin-top:12px"><a href="/privacy">Privacy</a> · <a href="/impressum">Impressum</a></p>
+    <button id="submitBtn" class="btn-main" style="max-width:280px;">Analyze Test</button>
+    <pre id="result">No result yet.</pre>
   </section>
 </main>
 <script src="/personality.js"></script>

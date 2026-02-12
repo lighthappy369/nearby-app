@@ -13,6 +13,7 @@ const startForm = document.getElementById('start-form');
 if (startForm) {
   startForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    window.location.href = '/personality-test';
+    const next = startForm.dataset.next || '/personality-test';
+    window.location.href = next;
   });
 }

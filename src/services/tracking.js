@@ -2,7 +2,8 @@ export const TRACKABLE_EVENTS = new Set([
   'page_view',
   'checkout_click',
   'paid',
-  'test_completed'
+  'test_completed',
+  'moderation_report'
 ]);
 
 export function validateEventName(name) {
