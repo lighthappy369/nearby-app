@@ -19,8 +19,25 @@ const copy = {
     answered: (a, t) => `${a}/${t} questions answered.`,
     error: (m) => `Error: ${m}`,
     photoNeed: 'Please select a photo first.'
+  },
+  de: {
+    loaded: (n) => `${n} Fragen geladen.`,
+    answered: (a, t) => `${a}/${t} Fragen beantwortet.`,
+    error: (m) => `Fehler: ${m}`,
+    photoNeed: 'Bitte zuerst ein Foto auswählen.'
+  },
+  ru: {
+    loaded: (n) => `Загружено вопросов: ${n}.`,
+    answered: (a, t) => `Отвечено: ${a}/${t}.`,
+    error: (m) => `Ошибка: ${m}`,
+    photoNeed: 'Сначала выберите фото.'
   }
-}[lang];
+}[lang] || {
+  loaded: (n) => `${n} questions loaded.`,
+  answered: (a, t) => `${a}/${t} questions answered.`,
+  error: (m) => `Error: ${m}`,
+  photoNeed: 'Please select a photo first.'
+};
 
 function renderQuestions(items) {
   const all = items;

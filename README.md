@@ -43,8 +43,12 @@ Uygulama artık basit debug panel yerine funnel odaklı web akışı sunar:
 
 - `http://localhost:3000/` veya `/tr` : Türkçe premium giriş ekranı
 - `http://localhost:3000/en` : İngilizce premium giriş ekranı
+- `http://localhost:3000/de` : Almanca premium giriş ekranı
+- `http://localhost:3000/ru` : Rusça premium giriş ekranı
 - `http://localhost:3000/personality-test` : TR kişilik testi (30 soru + foto analiz beta)
 - `http://localhost:3000/personality-test-en` : EN kişilik testi (30 soru + foto analiz beta)
+- `http://localhost:3000/personality-test-de` : DE kişilik testi (30 soru + foto analiz beta)
+- `http://localhost:3000/personality-test-ru` : RU kişilik testi (30 soru + foto analiz beta)
 - `http://localhost:3000/launch` : Stripe odaklı landing ekranı
 - `http://localhost:3000/privacy` ve `/impressum` : yasal sayfalar
 

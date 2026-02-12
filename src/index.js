@@ -133,9 +133,13 @@ async function handler(req, res) {
     if (method === 'GET' && path === '/') return serveHome(res);
     if (method === 'GET' && path === '/tr') return serveHome(res);
     if (method === 'GET' && path === '/en') return serveStatic(res, 'index-en.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/de') return serveStatic(res, 'index-de.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/ru') return serveStatic(res, 'index-ru.html', 'text/html; charset=utf-8');
     if (method === 'GET' && path === '/launch') return serveLaunch(res);
     if (method === 'GET' && path === '/personality-test') return serveStatic(res, 'personality-test.html', 'text/html; charset=utf-8');
     if (method === 'GET' && path === '/personality-test-en') return serveStatic(res, 'personality-test-en.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/personality-test-de') return serveStatic(res, 'personality-test-de.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/personality-test-ru') return serveStatic(res, 'personality-test-ru.html', 'text/html; charset=utf-8');
     if (method === 'GET' && path === '/privacy') return serveStatic(res, 'privacy.html', 'text/html; charset=utf-8');
     if (method === 'GET' && path === '/impressum') return serveStatic(res, 'impressum.html', 'text/html; charset=utf-8');
     if (method === 'GET' && path === '/style.css') return serveStatic(res, 'style.css', 'text/css; charset=utf-8');
