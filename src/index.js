@@ -11,13 +11,17 @@ import {
   setSubscription,
   getSubscription,
   saveEvent,
-  listEvents
+  listEvents,
+  saveCommunityMessage,
+  listCommunityMessages
 } from './data/store.js';
 import { rankCandidates, calculateCompatibility } from './services/matchEngine.js';
 import { generateIceBreakers, explainScore } from './services/aiCoach.js';
 import { listJungQuestions, scoreJungAnswers } from './services/jungEngine.js';
 import { makeSalt, hashPassword, createToken, verifyToken, bearerToken } from './services/auth.js';
 import { validateEventName } from './services/tracking.js';
+import { analyzeSoulDepth } from './services/depthAnalyzer.js';
+import { runSecurityAgents } from './services/securityAgents.js';
 
 function sendJson(res, status, payload) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -148,6 +152,8 @@ async function handler(req, res) {
     if (method === 'GET' && path === '/style.css') return serveStatic(res, 'style.css', 'text/css; charset=utf-8');
     if (method === 'GET' && path === '/script.js') return serveStatic(res, 'script.js', 'application/javascript; charset=utf-8');
     if (method === 'GET' && path === '/personality.js') return serveStatic(res, 'personality.js', 'application/javascript; charset=utf-8');
+    if (method === 'GET' && path === '/community') return serveStatic(res, 'community.html', 'text/html; charset=utf-8');
+    if (method === 'GET' && path === '/community.js') return serveStatic(res, 'community.js', 'application/javascript; charset=utf-8');
 
     if (method === 'GET' && path === '/health') {
       return sendJson(res, 200, { ok: true, service: 'empati-ai-mvp' });
@@ -263,6 +269,39 @@ async function handler(req, res) {
         },
         note: 'Photo analysis is currently a beta heuristic output.'
       });
+    }
+
+    if (method === 'POST' && path === '/security/scan') {
+      const { text = '' } = await readBody(req);
+      return sendJson(res, 200, runSecurityAgents(text));
+    }
+
+    if (method === 'POST' && path === '/ai/depth-analysis') {
+      const { text = '', jung = null } = await readBody(req);
+      const security = runSecurityAgents(text);
+      return sendJson(res, 200, {
+        security,
+        analysis: analyzeSoulDepth({ text, jung })
+      });
+    }
+
+    if (method === 'GET' && path === '/community/messages') {
+      return sendJson(res, 200, { items: listCommunityMessages(150) });
+    }
+
+    if (method === 'POST' && path === '/community/messages') {
+      const { alias = 'Anon', text = '', lang = 'tr' } = await readBody(req);
+      if (!String(text).trim()) return sendJson(res, 400, { error: 'text required.' });
+      const security = runSecurityAgents(text);
+      if (!security.safeToPublish) {
+        return sendJson(res, 422, {
+          error: 'message blocked by security agents.',
+          security
+        });
+      }
+
+      const row = saveCommunityMessage({ alias: String(alias).slice(0, 40), text: String(text).slice(0, 500), lang, security });
+      return sendJson(res, 201, row);
     }
 
     if (method === 'POST' && path === '/users') {

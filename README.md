@@ -52,6 +52,7 @@ Uygulama artık basit debug panel yerine funnel odaklı web akışı sunar:
 - `http://localhost:3000/personality-test-de` : DE kişilik testi (30 soru + foto analiz beta)
 - `http://localhost:3000/personality-test-ru` : RU kişilik testi (30 soru + foto analiz beta)
 - `http://localhost:3000/launch` : Stripe odaklı landing ekranı
+- `http://localhost:3000/community` : anonim topluluk sohbeti + AI derinlik analizi
 - `http://localhost:3000/privacy` ve `/impressum` : yasal sayfalar
 
 ## API Uç Noktaları
@@ -133,6 +134,15 @@ Döndürülen her aday için:
 `POST /photo/analyze`
 
 Not: Demo/heuristic sonuç döndürür; production ML pipeline yerine geçmez.
+
+### 14) Community mesajları (anonim sohbet)
+`GET /community/messages`, `POST /community/messages`
+
+### 15) Güvenlik ajanları
+`POST /security/scan`
+
+### 16) AI ruh derinlik analizi
+`POST /ai/depth-analysis`
 
 ## Monetizasyon için bir sonraki teknik adımlar
 

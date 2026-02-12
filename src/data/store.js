@@ -56,3 +56,16 @@ export function saveEvent(event) {
 export function listEvents(limit = 50) {
   return events.slice(-Math.max(1, Number(limit) || 50));
 }
+
+
+export const communityMessages = [];
+
+export function saveCommunityMessage(message) {
+  const row = { id: `cm_${communityMessages.length + 1}`, createdAt: new Date().toISOString(), ...message };
+  communityMessages.push(row);
+  return row;
+}
+
+export function listCommunityMessages(limit = 100) {
+  return communityMessages.slice(-Math.max(1, Number(limit) || 100));
+}

@@ -85,3 +85,31 @@ test('POST /stripe/webhook invalid json returns 400', async () => {
     server.close();
   }
 });
+
+
+test('POST /community/messages blocks unsafe content', async () => {
+  const { server, port } = await startServer();
+  try {
+    const res = await requestJson(port, 'POST', '/community/messages', {
+      alias: 'Anon',
+      text: 'mailim test@example.com',
+      lang: 'tr'
+    });
+    assert.equal(res.status, 422);
+  } finally {
+    server.close();
+  }
+});
+
+test('POST /ai/depth-analysis returns profile', async () => {
+  const { server, port } = await startServer();
+  try {
+    const res = await requestJson(port, 'POST', '/ai/depth-analysis', {
+      text: 'İlişkide güven, anlam ve duygusal derinlik benim için önemli.'
+    });
+    assert.equal(res.status, 200);
+    assert.equal(typeof res.json.analysis.profile.depth, 'number');
+  } finally {
+    server.close();
+  }
+});

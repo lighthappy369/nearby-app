@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Empati Community | Anonim Sohbet</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .wrap{max-width:980px;margin:30px auto;padding:0 16px}
+    .card{background:#fff;border:1px solid #e7e7e7;border-radius:10px;padding:16px;margin-bottom:14px}
+    textarea,input{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px}
+    .row{display:grid;grid-template-columns:1fr 2fr;gap:8px}
+    .msg{padding:10px;border-bottom:1px solid #eee}
+    .muted{color:#666;font-size:13px}
+    pre{background:#111827;color:#f9fafb;padding:10px;border-radius:8px;overflow:auto}
+  </style>
+</head>
+<body>
+<header class="navbar">
+  <div class="logo">EMPATI<span>COMMUNITY</span></div>
+  <div class="nav-links"><a href="/" class="btn-outline">Ana Sayfa</a></div>
+</header>
+<main class="wrap">
+  <section class="card">
+    <h2>Anonim Topluluk Sohbeti</h2>
+    <p class="muted">Güvenlik ajanları mesajları yayınlanmadan önce kontrol eder.</p>
+    <div class="row">
+      <input id="alias" placeholder="Takma ad (opsiyonel)" />
+      <input id="text" placeholder="Mesajını yaz..." />
+    </div>
+    <button id="sendBtn" class="btn-main" style="max-width:280px;margin-top:10px">Mesaj Gönder</button>
+  </section>
+
+  <section class="card">
+    <h3>Ruhun Derinlik Analizi (AI)</h3>
+    <textarea id="depthText" rows="4" placeholder="İç dünyanı, ilişki beklentini veya duygularını yaz..."></textarea>
+    <button id="depthBtn" class="btn-main" style="max-width:300px;margin-top:10px">AI Analizi Çalıştır</button>
+    <pre id="depthOut">Henüz analiz yok.</pre>
+  </section>
+
+  <section class="card">
+    <h3>Topluluk Akışı</h3>
+    <div id="feed"></div>
+  </section>
+</main>
+<script src="/community.js"></script>
+</body>
+</html>
