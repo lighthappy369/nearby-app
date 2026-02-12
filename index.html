@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Empati Berlin | Değer Tabanlı Eşleştirme</title>
+    <meta
+      name="description"
+      content="Empati Berlin, swipe yerine derinlik arayanlar için değer tabanlı ve arketip odaklı eşleştirme deneyimi sunar."
+    />
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --surface: rgba(255, 255, 255, 0.06);
+        --text: #dedede;
+        --muted: rgba(222, 222, 222, 0.82);
+        --muted2: rgba(222, 222, 222, 0.68);
+        --gold: #e1ad01;
+        --danger: #ff5a5f;
+        --line: rgba(255, 255, 255, 0.14);
+        --teal: #00838f;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(1200px 600px at 30% 10%, rgba(225, 173, 1, 0.12), transparent 60%),
+          radial-gradient(900px 500px at 80% 20%, rgba(255, 255, 255, 0.08), transparent 65%), var(--bg);
+        color: var(--text);
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        padding: 40px 16px;
+      }
+      .wrap { max-width: 920px; margin: 0 auto; }
+      header { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 16px; }
+      .brand { display: flex; gap: 10px; align-items: baseline; text-decoration: none; color: var(--text); }
+      .brand strong { font-size: 1.05rem; letter-spacing: -0.02em; }
+      .brand span { color: var(--muted2); font-size: 0.95rem; }
+      .lang { display: flex; gap: 10px; align-items: center; color: var(--muted2); font-size: 0.92rem; }
+      .lang a { color: var(--muted); text-decoration: none; }
+      .lang a[aria-current='page'] { color: var(--text); }
+      .topbar {
+        position: sticky;
+        top: 10px;
+        z-index: 5;
+        background: linear-gradient(90deg, rgba(225, 173, 1, 0.18), rgba(255, 255, 255, 0.06));
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 14px;
+        padding: 12px 14px;
+        margin: 0 0 18px 0;
+      }
+      .topbar p { margin: 0; color: rgba(255, 255, 255, 0.86); }
+      .grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 18px; }
+      @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+      .card {
+        background: var(--surface);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        padding: 22px;
+        backdrop-filter: blur(8px);
+      }
+      .cardGlow { box-shadow: 0 4px 20px rgba(225, 173, 1, 0.05); }
+      h1 { font-size: clamp(2.1rem, 4.6vw, 3.2rem); letter-spacing: -0.04em; margin: 0 0 12px; line-height: 1.08; }
+      p { line-height: 1.6; color: var(--muted); margin: 0 0 12px; }
+      .gold { color: var(--gold); }
+      ul { margin: 10px 0 0 18px; padding: 0; color: var(--muted); line-height: 1.6; }
+      li { margin: 6px 0; }
+      .ctaRow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 16px; }
+      .cta, .cta-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+        background: var(--gold); color: #000; padding: 14px 18px; border: none; font-weight: 800;
+        border-radius: 10px; text-decoration: none; transition: transform 0.15s ease, filter 0.15s ease;
+      }
+      .cta { min-width: 240px; }
+      .cta-btn { width: 100%; cursor: pointer; }
+      .cta:hover, .cta-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+      .ghost {
+        display: inline-flex; align-items: center; justify-content: center; padding: 12px 16px;
+        border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.22); color: var(--text); text-decoration: none;
+      }
+      .note { font-size: 0.9rem; color: var(--muted2); margin-top: 10px; }
+      .pill {
+        display: inline-block; font-size: 0.82rem; padding: 6px 10px; border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18); color: var(--muted2); margin-bottom: 14px;
+      }
+      .legalWarn { margin-top: 10px; font-size: 0.92rem; color: rgba(255, 255, 255, 0.72); }
+      .legalWarn strong { color: var(--danger); }
+      .faq { margin-top: 18px; }
+      details { border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 12px; padding: 12px 14px; background: rgba(255, 255, 255, 0.04); margin: 10px 0; }
+      summary { cursor: pointer; color: rgba(255, 255, 255, 0.92); font-weight: 700; }
+      details p { margin: 10px 0 0; }
+      .intentWrap { text-align: center; margin: 14px 0 18px; }
+      .intentBtns { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+      .intentGrid { display: grid; gap: 10px; max-width: 340px; margin: 0 auto; }
+      .btnOutlineGold { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+      .btnOutline { background: transparent; border: 1px solid var(--line); color: var(--text); }
+      .btnTeal { background: transparent; border: 1px solid rgba(0, 131, 143, 0.6); color: #8be9f0; }
+      .formGrid { display: grid; gap: 12px; margin-top: 10px; }
+      label > span { display: block; margin-bottom: 6px; }
+      select { width: 100%; padding: 10px; border-radius: 10px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.18); color: var(--text); }
+      option { color: #111; }
+      .consent {
+        margin: 14px 0;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .consent p { margin: 0 0 8px; font-size: 0.9rem; }
+      .consent label { font-size: 0.9rem; color: var(--text); }
+      .paywallBox {
+        text-align: center;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: rgba(0, 0, 0, 0.25);
+      }
+      .site-footer {
+        margin-top: 24px;
+        border-top: 1px solid var(--line);
+        padding-top: 20px;
+      }
+      .footer-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; }
+      .footer-col h4 { margin: 0 0 12px; color: #fff; }
+      .footer-col ul { list-style: none; margin: 0; padding: 0; }
+      .footer-col li { margin: 8px 0; }
+      .footer-col a { color: var(--muted2); text-decoration: none; }
+      .footer-col a:hover { color: var(--gold); }
+      .footer-bottom { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); text-align: center; color: var(--muted2); font-size: 0.82rem; }
+      .trustBar { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-top: 10px; opacity: 0.75; }
+      @media (max-width: 640px) { body { padding: 28px 12px; } }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="topbar" role="note" aria-label="Ön Satış Notu">
+        <p><strong>Berlin, gerçek bir şey inşa ediyoruz.</strong> Founder olarak tek seferlik 4,99 € ile ömür boyu premium erişim al.</p>
+      </div>
+
+      <header>
+        <a class="brand" href="index.html" aria-label="Empati Berlin Ana Sayfa">
+          <strong>Empati Berlin</strong>
+          <span>Değer Tabanlı Eşleştirme</span>
+        </a>
+        <nav class="lang" aria-label="Dil">
+          <a href="index.html" aria-current="page">TR</a>
+          <span aria-hidden="true">/</span>
+          <a href="index-en.html">EN</a>
+        </nav>
+      </header>
+
+      <div class="grid">
+        <section class="card" aria-label="Değer Önerisi">
+          <div class="pill">Erken Erişim • Berlin</div>
+          <h1>Swipe yerine <span class="gold">derinlik</span>: değer tabanlı eşleştirme, arketip odağında.</h1>
+          <p style="font-size: 0.9rem; color: var(--gold); margin: 0 0 18px 0;">
+            Her 15 dakikada bir Berlinli Empati ile kendine daha net bakıyor.<br />
+            <span style="color: var(--muted); font-size: 0.8rem;">(C. G. Jung'dan esinlenildi – teşhis aracı değildir)</span>
+          </p>
+
+          <section id="intent-section" class="intentWrap" aria-label="Kısa Giriş Soruları">
+            <div id="step-1">
+              <h3>1. Yüzeyin ötesine bakmaya hazır mısın?</h3>
+              <div class="intentBtns">
+                <button class="cta-btn btnOutlineGold" type="button" onclick="saveIntent('ready','yes'); showStep()">Evet, kesinlikle</button>
+                <button class="cta-btn btnOutline" type="button" onclick="saveIntent('ready','maybe'); showStep()">Meraklıyım</button>
+              </div>
+            </div>
+            <div id="step-2" style="display:none;">
+              <h3>2. Berlin'de ne arıyorsun?</h3>
+              <div class="intentGrid">
+                <button class="cta-btn btnOutlineGold" type="button" onclick="saveIntent('goal','soulmate'); scrollToSurvey()">Ruh eşi</button>
+                <button class="cta-btn btnOutline" type="button" onclick="saveIntent('goal','deeptalk'); scrollToSurvey()">Derin sohbet & randevu</button>
+                <button class="cta-btn btnTeal" type="button" onclick="saveIntent('goal','casualdeep'); scrollToSurvey()">Rahat ama derinlikli</button>
+              </div>
+            </div>
+          </section>
+
+          <p>Empati Berlin, insanları değerler ve ilişki beklentileri üzerinden bir araya getirir. Amaç, gerçek sohbetler için güçlü bir başlangıç sunmaktır.</p>
+          <div class="ctaRow">
+            <a href="STRIPE_PAYMENT_LINK_HERE" class="cta" rel="nofollow">Founder ol & kendini keşfet — 4,99 €</a>
+            <a class="ghost" href="#founder">Ne alırsın</a>
+          </div>
+          <p class="note">Satın alma sonrası 15–20 soruluk profil kontrol linki ve sonraki adımlar e-posta ile gelir.</p>
+        </section>
+
+        <aside class="card cardGlow" id="founder" aria-label="Kapsam & Faydalar">
+          <h2>Founder Erişimi (4,99 €) içerir</h2>
+          <ul>
+            <li>Berlin beta sürümüne erken erişim</li>
+            <li>Arketip odaklı profil kontrolü (15–20 soru)</li>
+            <li>PDF/özet formatında ilk profil çıktısı</li>
+            <li>Yeni özellik güncellemelerine öncelikli davet</li>
+          </ul>
+          <p class="legalWarn"><strong>Önemli:</strong> Terapötik hizmet değildir. Sonuçlar yönlendiricidir, teşhis değildir.</p>
+        </aside>
+      </div>
+
+      <section class="card" aria-label="Profil Kontrolü" style="margin-top: 18px;">
+        <h2 style="margin:0 0 8px;">Profil Kontrolü (Beta)</h2>
+        <p class="note" style="margin-top: 0;">
+          Ölçek: 1 (katılmıyorum) – 5 (tamamen katılıyorum)
+        </p>
+        <form id="archetypeForm">
+          <div class="consent">
+            <p><strong>Not:</strong> Bu form yalnızca öz değerlendirme ve eşleşme önerileri içindir; terapi/teşhis yerine geçmez.</p>
+            <label><input type="checkbox" name="consent" required /> Profil oluşturma amacıyla verilerimin işlenmesine açıkça onay veriyorum.</label>
+          </div>
+          <div class="formGrid">
+            <label>
+              <span>1) Yeni insanlarla tanışmak bana enerji verir.</span>
+              <select name="q1" required>
+                <option value="" disabled selected>Lütfen seçin…</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+              </select>
+            </label>
+            <label>
+              <span>2) Yalnız kalmak beni yeniden dengeler.</span>
+              <select name="q2" required>
+                <option value="" disabled selected>Lütfen seçin…</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+              </select>
+            </label>
+          </div>
+          <button class="cta" type="submit" style="margin-top:14px;">Profil önizlemesi oluştur</button>
+        </form>
+      </section>
+
+      <footer class="site-footer">
+        <div class="footer-container">
+          <div class="footer-col">
+            <h4>Kurumsal</h4>
+            <ul>
+              <li><a href="index.html">Ana sayfa</a></li>
+              <li><a href="#founder">Founder erişimi</a></li>
+              <li><a href="impressum.html">Künye (Impressum)</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Yasal</h4>
+            <ul>
+              <li><a href="privacy.html">Gizlilik politikası</a></li>
+              <li><a href="impressum.html">Yasal bildirim</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Destek</h4>
+            <ul>
+              <li><a href="mailto:email@example.com">Yardım & iletişim</a></li>
+              <li><a href="#intent-section">Nasıl çalışır?</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <div class="trustBar">
+            <span>🛡️ Berlin'de üretildi</span>
+            <span>🔒 SSL şifreli ödeme</span>
+            <span>🇪🇺 GDPR/DSGVO uyumlu</span>
+          </div>
+          <p>© <span id="y">2026</span> Empati Berlin. Tüm hakları saklıdır.</p>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      document.getElementById('y').textContent = String(new Date().getFullYear());
+      function saveIntent(key, value) {
+        try { localStorage.setItem('empati_intent_' + key, value); } catch (e) {}
+      }
+      function showStep() {
+        const s1 = document.getElementById('step-1');
+        const s2 = document.getElementById('step-2');
+        if (!s1 || !s2) return;
+        s1.style.display = 'none';
+        s2.style.display = 'block';
+      }
+      function scrollToSurvey() {
+        const target = document.querySelector('section[aria-label="Profil Kontrolü"]');
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      }
+      (function () {
+        const form = document.getElementById('archetypeForm');
+        if (!form) return;
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          form.innerHTML =
+            '<div class="paywallBox">' +
+            '<div style="font-size:3rem;font-weight:900;color:var(--gold);">89%</div>' +
+            '<h3>Potansiyel uyum bulundu!</h3>' +
+            '<p class="note">Arketip önizlemen hazır: <strong>Kaşif</strong></p>' +
+            '<a href="STRIPE_PAYMENT_LINK_HERE" class="cta-btn" rel="nofollow" style="margin-top:14px;">Raporu aç & Founder ol (4,99 €)</a>' +
+            '<p class="note" style="margin-top:10px;">Tek seferlik ödeme. Abonelik yok.</p>' +
+            '</div>';
+          const section = form.closest('section');
+          if (section) window.scrollTo({ top: section.offsetTop - 30, behavior: 'smooth' });
+        });
+      })();
+    </script>
+  </body>
+</html>
